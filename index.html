@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>My Page Title</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body style="
+    cursor: auto;
+    margin: 0;
+    overflow-y: scroll;
+    -webkit-user-select: none;
+    ">
+    <link rel="stylesheet" href="style.css">
+
+    <script>
+
+        async function main() {
+
+            await fetch_recommend_from_song()
+
+            await fetch_recommend_from_text()
+
+        }
+
+    </script>
+
+
+    <script>
+
+        const sleep = sec => new Promise(r => setTimeout(r, sec*1_000))
+
+        async function fetch_recommend_from_song() {
+            let xhr = new XMLHttpRequest()
+            let response
+            xhr.open("GET", "https://ufrequency.ai.ap.ngrok.io/recommend_from_song", true)
+            xhr.setRequestHeader("url", "tAGnKpE4NCI")
+            xhr.setRequestHeader("use_segments", 1)
+            xhr.setRequestHeader("use_deep_embed", 1)
+            xhr.setRequestHeader("n", 10)
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    console.log('fetch_recommend_from_song response:',xhr.responseText)
+                    response = JSON.parse(xhr.responseText).answer
+                }
+            }
+            xhr.send()
+            while (xhr.readyState != XMLHttpRequest.DONE) await sleep(.1)
+            return response
+        }
+
+        async function fetch_recommend_from_text() {
+            let xhr = new XMLHttpRequest()
+            let response
+            xhr.open("GET", "https://ufrequency.ai.ap.ngrok.io/recommend_from_text", true)
+            xhr.setRequestHeader("text", "rock song with distortion guitar")
+            xhr.setRequestHeader("use_segments", 1)
+            xhr.setRequestHeader("n", 10)
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    console.log('fetch_recommend_from_text response:',xhr.responseText)
+                    response = JSON.parse(xhr.responseText).answer
+                }
+            }
+            xhr.send()
+            while (xhr.readyState != XMLHttpRequest.DONE) await sleep(.1)
+            return response
+        }
+
+
+
+
+    </script>
+
+    <script>
+
+        main()
+
+    </script>
+
+</body>
+</html>
