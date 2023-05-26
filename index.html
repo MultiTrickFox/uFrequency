@@ -20,29 +20,34 @@
 
         async function main() {
 
-            let response1 = await fetch_recommend_from_song("tAGnKpE4NCI", 1, 1, 10)
-            console.log('recommended from song:\n',response1)
+            let response_from_song = await fetch_recommend_from_song("tAGnKpE4NCI", 1, 1, 10)
+            console.log('recommended from song:\n',response_from_song)
 
-            let response2 = await fetch_recommend_from_text("rock song with distortion guitar", 1, 10)
-            console.log('recommended from text:\n',response2)
+            let response_from_text = await fetch_recommend_from_text("rock song with distortion guitar", 1, 10)
+            console.log('recommended from text:\n',response_from_text)
 
-            let response3 = await fetch_get_playlists()
-            console.log('current playlists:\n',response3)
-            console.log('an example playlist:\n',response3['plistkey'])
-            console.log('an example playlist item:\n',response3['plistkey'][0]) // the initial query
-            console.log('an example playlist item:\n',response3['plistkey'][1][1]) // a song element
+            let mp3_data = await fetch('https://cdn.pixabay.com/download/audio/2022/02/08/audio_b270bd6a3c.mp3?filename=yakaliyakali-18486.mp3&g-recaptcha-response=03AL8dmw-kz4JqJUFAA-scxuNDDA2T6ofhIhuZzBXk5nvAYmApmTFROehI-QgFd8q72Jr4ZbaPMVC-ftu09-uYYiAC7kNaikCTQ9g-9LodJMt-dgdhvMjgcFT-e_jsF559o1QTWvC8nCtMtvVx4BDRKFTLTF4FAnDDzs-LmxRRCis6Bi6VjcW4sWO7bB2Gs7_8eXPVKNh3_1U4WtCaMEohkIQxApZ5FFGZwqTQSJ6iw7AQBBDQxKOQSBL2KGhvB5FE5mvQQzwCaXjeaMkDkm7TE6BFS3nBYb48H1PkPXXI9yBCM-VL1IdgRfVmf6VCHclt93kJpEeS7RnE5SU8kyg3rvAWLqc62rt_y5H5tnR-GzLAn_prKcQQ4DaTfmJrWwHZ_wpalFDIn_rIKrFzMM0KrY-hhvl3-lpw2qPG15_lgiv0iG97YrglhhmYN_hFFlg2_xPGbdgM6xn-rmrzA1xMr2AZeHourLJAPrNIBJl3x-FmGtuutFZF2nHMnyriXYDucDk5Q_AMuBq_hFita7lYF_rYEhnjfTkBZQ&remote_template=1')
+            mp3_data = await mp3_data.arrayBuffer()
+            let response_from_audio = await fetch_recommend_from_audio(mp3_data, "deneme.mp3", 1, 1, 10)
+            console.log('recommended from audio:\n',response_from_audio)
+
+            let response_playlists = await fetch_get_playlists()
+            console.log('current playlists:\n',response_playlists)
+            console.log('an example playlist:\n',response_playlists['plistkey'])
+            console.log('an example playlist query:\n',response_playlists['plistkey'][0]) // the initial query
+            console.log('an example playlist items:\n',response_playlists['plistkey'][1]) // the songs list
 
             //
 
             let query = "tAGnKpE4NCI"
-            let contents = response1.map(e => e[0])
-            let response4 = await fetch_set_playlist(query, contents)
-            console.log('added a playlist with id:\n',response4)
+            let contents = response_from_song.map(e => e[0])
+            let response_playlist_identifier = await fetch_set_playlist(query, contents)
+            console.log('added a playlist with id:\n',response_playlist_identifier)
 
             //
 
             await fetch_get_playlists()
-            await fetch_remove_playlist(response4)
+            await fetch_remove_playlist(response_playlist_identifier)
             await fetch_get_playlists()
 
             //
@@ -64,6 +69,8 @@
     <script>
 
         const sleep = sec => new Promise(r => setTimeout(r, sec*1_000))
+
+        //
 
         async function fetch_recommend_from_song(url, use_segments, use_deep_embed, n) {
             let xhr = new XMLHttpRequest()
@@ -107,6 +114,30 @@
             response = eval(response.replace(/\)/g,']').replace(/\(/g,'['))
             return response
         }
+
+        async function fetch_recommend_from_audio(audio, audio_name, use_segments, use_deep_embed, n) {
+            let xhr = new XMLHttpRequest()
+            let response
+            xhr.open("POST", "https://ufrequency.ai.ap.ngrok.io/recommend_from_audio", true)
+            xhr.setRequestHeader("username", username)
+            xhr.setRequestHeader("password", password)
+            xhr.setRequestHeader("audio_name", audio_name)
+            xhr.setRequestHeader("use_segments", use_segments)
+            xhr.setRequestHeader("use_deep_embed", use_deep_embed)
+            xhr.setRequestHeader("n", n)
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    console.log('recommend_from_audio response:',xhr.responseText)
+                    response = JSON.parse(xhr.responseText).answer
+                }
+            }
+            xhr.send(audio)
+            while (xhr.readyState != XMLHttpRequest.DONE) await sleep(.1)
+            response = eval(response.replace(/\)/g,']').replace(/\(/g,'['))
+            return response
+        }
+
+        //
 
         async function fetch_get_playlists() {
             let xhr = new XMLHttpRequest()
@@ -206,7 +237,7 @@
             return response
         }
 
-
+        //
 
     </script>
 
