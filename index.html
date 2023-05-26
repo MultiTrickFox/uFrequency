@@ -83,7 +83,7 @@
             }
             xhr.send()
             while (xhr.readyState != XMLHttpRequest.DONE) await sleep(.1)
-            response = eval(response)
+            response = eval(response.replace(/\)/g,']').replace(/\(/g,'['))
             return response
         }
 
@@ -104,7 +104,7 @@
             }
             xhr.send()
             while (xhr.readyState != XMLHttpRequest.DONE) await sleep(.1)
-            response = eval(response)
+            response = eval(response.replace(/\)/g,']').replace(/\(/g,'['))
             return response
         }
 
