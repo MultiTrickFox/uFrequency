@@ -15,15 +15,51 @@
 
     <script>
 
+        var username = 'Zer0'
+        var password = 'none'
+
         async function main() {
 
-            let response1 = await fetch_recommend_from_song()
-            console.log(response1)
+            let response1 = await fetch_recommend_from_song("tAGnKpE4NCI", 1, 1, 10)
+            response1 = eval(response1.replace(/\)/g,']').replace(/\(/g,'['))
+            console.log('recommended from song:\n',response1)
 
-            let response2 = await fetch_recommend_from_text()
-            console.log(response2)
+            let response2 = await fetch_recommend_from_text("rock song with distortion guitar", 1, 10)
+            response2 = eval(response2.replace(/\)/g,']').replace(/\(/g,'['))
+            console.log('recommended from text:\n',response2)
 
-        }
+            let response3 = await fetch_get_playlists()
+            console.log('current playlists:\n',response3)
+            console.log('an example playlist:\n',response3['plistkey'])
+            console.log('an example playlist item:\n',response3['plistkey'][0]) // the initial query
+            console.log('an example playlist item:\n',response3['plistkey'][1][1]) // a song element
+
+            //
+
+            let query = "tAGnKpE4NCI"
+            let contents = response1.map(e => e[0])
+            let response4 = await fetch_set_playlist(query, contents)
+            console.log('added a playlist with id:\n',response4)
+
+            //
+
+            await fetch_get_playlists()
+            await fetch_remove_playlist(response4)
+            await fetch_get_playlists()
+
+            //
+            
+            await fetch_insert_into_playlist('plistkey', ['deneme_song1', 'deneme_song2'], 1)
+            await fetch_get_playlists()
+
+            //
+
+            await fetch_remove_from_playlist('plistkey', ['deneme_song1', 'deneme_song2'])
+            await fetch_get_playlists()
+
+            //
+
+        }       
 
     </script>
 
@@ -31,17 +67,19 @@
 
         const sleep = sec => new Promise(r => setTimeout(r, sec*1_000))
 
-        async function fetch_recommend_from_song() {
+        async function fetch_recommend_from_song(url, use_segments, use_deep_embed, n) {
             let xhr = new XMLHttpRequest()
             let response
             xhr.open("GET", "https://ufrequency.ai.ap.ngrok.io/recommend_from_song", true)
-            xhr.setRequestHeader("url", "tAGnKpE4NCI")
-            xhr.setRequestHeader("use_segments", 1)
-            xhr.setRequestHeader("use_deep_embed", 1)
-            xhr.setRequestHeader("n", 10)
+            xhr.setRequestHeader("username", username)
+            xhr.setRequestHeader("password", password)
+            xhr.setRequestHeader("url", url)
+            xhr.setRequestHeader("use_segments", use_segments)
+            xhr.setRequestHeader("use_deep_embed", use_deep_embed)
+            xhr.setRequestHeader("n", n)
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == XMLHttpRequest.DONE) {
-                    console.log('fetch_recommend_from_song response:',xhr.responseText)
+                    console.log('recommend_from_song response:',xhr.responseText)
                     response = JSON.parse(xhr.responseText).answer
                 }
             }
@@ -50,16 +88,18 @@
             return response
         }
 
-        async function fetch_recommend_from_text() {
+        async function fetch_recommend_from_text(text, use_segments, n) {
             let xhr = new XMLHttpRequest()
             let response
             xhr.open("GET", "https://ufrequency.ai.ap.ngrok.io/recommend_from_text", true)
-            xhr.setRequestHeader("text", "rock song with distortion guitar")
-            xhr.setRequestHeader("use_segments", 1)
-            xhr.setRequestHeader("n", 10)
+            xhr.setRequestHeader("username", username)
+            xhr.setRequestHeader("password", password)
+            xhr.setRequestHeader("text", text)
+            xhr.setRequestHeader("use_segments", use_segments)
+            xhr.setRequestHeader("n", n)
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == XMLHttpRequest.DONE) {
-                    console.log('fetch_recommend_from_text response:',xhr.responseText)
+                    console.log('recommend_from_text response:',xhr.responseText)
                     response = JSON.parse(xhr.responseText).answer
                 }
             }
@@ -67,6 +107,106 @@
             while (xhr.readyState != XMLHttpRequest.DONE) await sleep(.1)
             return response
         }
+
+        async function fetch_get_playlists() {
+            let xhr = new XMLHttpRequest()
+            let response
+            xhr.open("GET", "https://ufrequency.ai.ap.ngrok.io/playlist", true)
+            xhr.setRequestHeader("username", username)
+            xhr.setRequestHeader("password", password)
+            xhr.setRequestHeader("cmd", "get")
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    console.log('get_playlists response:',xhr.responseText)
+                    response = JSON.parse(xhr.responseText).answer
+                }
+            }
+            xhr.send()
+            while (xhr.readyState != XMLHttpRequest.DONE) await sleep(.1)
+            return response
+        }
+
+        async function fetch_set_playlist(query, contents) {
+            let xhr = new XMLHttpRequest()
+            let response
+            xhr.open("GET", "https://ufrequency.ai.ap.ngrok.io/playlist", true)
+            xhr.setRequestHeader("username", username)
+            xhr.setRequestHeader("password", password)
+            xhr.setRequestHeader("cmd", "set")
+            xhr.setRequestHeader("query", query)
+            xhr.setRequestHeader("contents", contents)
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    console.log('set_playlist response:',xhr.responseText)
+                    response = JSON.parse(xhr.responseText).answer
+                }
+            }
+            xhr.send()
+            while (xhr.readyState != XMLHttpRequest.DONE) await sleep(.1)
+            return response
+        }
+
+        async function fetch_remove_playlist(identifier) {
+            let xhr = new XMLHttpRequest()
+            let response
+            xhr.open("GET", "https://ufrequency.ai.ap.ngrok.io/playlist", true)
+            xhr.setRequestHeader("username", username)
+            xhr.setRequestHeader("password", password)
+            xhr.setRequestHeader("cmd", "remove")
+            xhr.setRequestHeader("identifier", identifier)
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    console.log('remove_playlist response:',xhr.responseText)
+                    response = JSON.parse(xhr.responseText).answer
+                }
+            }
+            xhr.send()
+            while (xhr.readyState != XMLHttpRequest.DONE) await sleep(.1)
+            return response
+        }
+
+        async function fetch_remove_from_playlist(identifier, contents) {
+            let xhr = new XMLHttpRequest()
+            let response
+            xhr.open("GET", "https://ufrequency.ai.ap.ngrok.io/playlist", true)
+            xhr.setRequestHeader("username", username)
+            xhr.setRequestHeader("password", password)
+            xhr.setRequestHeader("cmd", "remove_from")
+            xhr.setRequestHeader("identifier", identifier)
+            xhr.setRequestHeader("contents", contents)
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    console.log('remove_from_playlist response:',xhr.responseText)
+                    response = JSON.parse(xhr.responseText).answer
+                }
+            }
+            xhr.send()
+            while (xhr.readyState != XMLHttpRequest.DONE) await sleep(.1)
+            return response
+        }
+
+        async function fetch_insert_into_playlist(identifier, contents, index) {
+            let xhr = new XMLHttpRequest()
+            let response
+            xhr.open("GET", "https://ufrequency.ai.ap.ngrok.io/playlist", true)
+            xhr.setRequestHeader("username", username)
+            xhr.setRequestHeader("password", password)
+            xhr.setRequestHeader("cmd", "insert_into")
+            xhr.setRequestHeader("identifier", identifier)
+            xhr.setRequestHeader("contents", contents)
+            xhr.setRequestHeader("index", index)
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    console.log('insert_into_playlist response:',xhr.responseText)
+                    response = JSON.parse(xhr.responseText).answer
+                }
+            }
+            xhr.send()
+            while (xhr.readyState != XMLHttpRequest.DONE) await sleep(.1)
+            return response
+        }
+
+
 
     </script>
 
