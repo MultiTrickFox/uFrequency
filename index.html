@@ -21,11 +21,9 @@
         async function main() {
 
             let response1 = await fetch_recommend_from_song("tAGnKpE4NCI", 1, 1, 10)
-            response1 = eval(response1.replace(/\)/g,']').replace(/\(/g,'['))
             console.log('recommended from song:\n',response1)
 
             let response2 = await fetch_recommend_from_text("rock song with distortion guitar", 1, 10)
-            response2 = eval(response2.replace(/\)/g,']').replace(/\(/g,'['))
             console.log('recommended from text:\n',response2)
 
             let response3 = await fetch_get_playlists()
@@ -85,6 +83,7 @@
             }
             xhr.send()
             while (xhr.readyState != XMLHttpRequest.DONE) await sleep(.1)
+            response = eval(response)
             return response
         }
 
@@ -105,6 +104,7 @@
             }
             xhr.send()
             while (xhr.readyState != XMLHttpRequest.DONE) await sleep(.1)
+            response = eval(response)
             return response
         }
 
