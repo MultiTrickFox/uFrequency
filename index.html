@@ -13,12 +13,23 @@
     ">
     <link rel="stylesheet" href="style.css">
 
+    <label for="username">Username:</label> <input type="password" id="username" name="username" onchange="username=this.value">
+    <label for="password">Password:</label> <input type="password" id="password" name="password" onchange="password=this.value">
+
     <script>
 
         var username = 'Zer0'
         var password = 'none'
 
+        
+
         async function main() {
+
+
+
+        }
+
+        async function test() {
 
             let response_from_song = await fetch_recommend_from_song("tAGnKpE4NCI", 1, 1, 10)
             console.log('recommended from song:\n',response_from_song)
@@ -26,7 +37,7 @@
             let response_from_text = await fetch_recommend_from_text("rock song with distortion guitar", 1, 10)
             console.log('recommended from text:\n',response_from_text)
 
-            let mp3_data = await fetch('https://cdn.pixabay.com/download/audio/2022/02/08/audio_b270bd6a3c.mp3?filename=yakaliyakali-18486.mp3&g-recaptcha-response=03AL8dmw-kz4JqJUFAA-scxuNDDA2T6ofhIhuZzBXk5nvAYmApmTFROehI-QgFd8q72Jr4ZbaPMVC-ftu09-uYYiAC7kNaikCTQ9g-9LodJMt-dgdhvMjgcFT-e_jsF559o1QTWvC8nCtMtvVx4BDRKFTLTF4FAnDDzs-LmxRRCis6Bi6VjcW4sWO7bB2Gs7_8eXPVKNh3_1U4WtCaMEohkIQxApZ5FFGZwqTQSJ6iw7AQBBDQxKOQSBL2KGhvB5FE5mvQQzwCaXjeaMkDkm7TE6BFS3nBYb48H1PkPXXI9yBCM-VL1IdgRfVmf6VCHclt93kJpEeS7RnE5SU8kyg3rvAWLqc62rt_y5H5tnR-GzLAn_prKcQQ4DaTfmJrWwHZ_wpalFDIn_rIKrFzMM0KrY-hhvl3-lpw2qPG15_lgiv0iG97YrglhhmYN_hFFlg2_xPGbdgM6xn-rmrzA1xMr2AZeHourLJAPrNIBJl3x-FmGtuutFZF2nHMnyriXYDucDk5Q_AMuBq_hFita7lYF_rYEhnjfTkBZQ&remote_template=1')
+            let mp3_data = await fetch('https://cdn.pixabay.com/download/audio/2022/02/08/audio_b270bd6a3c.mp3?filename=yakaliyakali-18486.mp3')
             mp3_data = await mp3_data.arrayBuffer()
             let response_from_audio = await fetch_recommend_from_audio(mp3_data, "deneme.mp3", 1, 1, 10)
             console.log('recommended from audio:\n',response_from_audio)
@@ -39,9 +50,7 @@
 
             //
 
-            let query = "tAGnKpE4NCI"
-            let contents = response_from_song.map(e => e[0])
-            let response_playlist_identifier = await fetch_set_playlist(query, contents)
+            let response_playlist_identifier = await fetch_set_playlist("song_tAGnKpE4NCI", response_from_song.map(e => e[0]))
             console.log('added a playlist with id:\n',response_playlist_identifier)
 
             //
@@ -243,7 +252,7 @@
 
     <script>
 
-        main()
+        test()
 
     </script>
 
