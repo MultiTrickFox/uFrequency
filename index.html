@@ -2,8 +2,8 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>My Page Title</title>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <title>uFrequency.Ai</title>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 </head>
 <body style="
     cursor: auto;
@@ -17,14 +17,15 @@
 
         async function main() {
 
-            await fetch_recommend_from_song()
+            let response1 = await fetch_recommend_from_song()
+            console.log(response1)
 
-            await fetch_recommend_from_text()
+            let response2 = await fetch_recommend_from_text()
+            console.log(response2)
 
         }
 
     </script>
-
 
     <script>
 
@@ -66,9 +67,6 @@
             while (xhr.readyState != XMLHttpRequest.DONE) await sleep(.1)
             return response
         }
-
-
-
 
     </script>
 
