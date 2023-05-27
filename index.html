@@ -20,7 +20,7 @@
         let query_text = document.createElement('textarea')
         document.body.appendChild(query_text)
         query_text.type = 'text'
-        query_text.placeholder = 'Enter Your Query\nand Hit Enter\n\n\n~ examples ~\n\n"Hard rock with heavy hitting riffs"\n"Space age songs with galactic noises"\n\nwww.youtube.com/watch?v=dQw4w9WgXcQ\n\n '
+        query_text.placeholder = 'Paste a Youtube URL to start'
         query_text.rows = 6
         query_text.style.resize = 'none'
         query_text.style.display = 'block'
@@ -64,6 +64,13 @@
                     iframe.scrolling = 'no'
                     iframe.frameBorder = '0'
 
+                    iframe.style.width = '600px'
+                    iframe.style.height = '380px'
+                    iframe.style.margin = '0 auto'
+                    iframe.style.display = 'flex'
+                    iframe.style.justify_content = 'center'
+                    iframe.style.align_items = 'center'
+
                     iframeContainer.appendChild(iframe)
                     playlist.appendChild(iframeContainer)
                 }
@@ -76,7 +83,15 @@
 
         let playlist = document.createElement('div')
         document.body.appendChild(playlist)
-        playlist.className = 'playlist'
+        playlist.style.position = 'fixed'
+        playlist.style.top = '55%'
+        playlist.style.left = '50%'
+        playlist.style.transform = 'translate(-50%, -50%)'
+        playlist.style.width = '85%'
+        playlist.style.height = '80%'
+        playlist.style.backgroundColor = '#000000'
+        playlist.style.overflowY = 'scroll'
+        playlist.style.display = 'block'
         
 
 
