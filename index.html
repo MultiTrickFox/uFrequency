@@ -15,48 +15,60 @@
 
     <script>
 
-        let query_text = document.createElement('input')
+        let query_processing = false
+
+        let query_text = document.createElement('textarea')
         document.body.appendChild(query_text)
         query_text.type = 'text'
-        query_text.placeholder = 'Enter your query'
+        query_text.placeholder = '\nEnter Your Query\n\n\n~ examples ~\n\n"Hard rock with heavy hitting riffs"\n"Space age songs with galactic noises"\n\nwww.youtube.com/watch?v=dQw4w9WgXcQ\n\n '
+        query_text.rows = 5
+        query_text.style.resize = 'none'
+        query_text.style.display = 'block'
+        query_text.style.width = '30%'
+        query_text.style.height = '30%'
+        query_text.style.margin = '2% auto 0'
+        query_text.style.textAlign = 'center'
+        query_text.style.font = '8pt Quicksand'
 
-        let query_button = document.createElement('button')
-        document.body.appendChild(query_button)
-        query_button.textContent = 'Search'
-        let query_processing = false
-        query_button.addEventListener('click', async function() {
-            if (query_processing) return
-            query_processing = true
-            document.body.style.cursor = 'wait'
-
+        query_text.addEventListener('input', async function() {
+            console.log('Text has changed:', query_text.value)
             let query = query_text.value
-            let recommendations = await (
-                (query.includes('www') || query.includes('http')) ? 
-                    fetch_recommend_from_song(query, 1, 1, 10) :
-                    fetch_recommend_from_text(query, 1, 10)
-            )
+            if (query.includes('\n')) {
+                query = query.replace('\n','')
+                query_text.value = query
 
-            playlist.innerHTML = ''
-            for (let i = 0; i < recommendations.length; i++) {
-                let item = recommendations[i][0]
+                if (query_processing) return
+                query_processing = true
+                document.body.style.cursor = 'wait'
 
-                let iframeContainer = document.createElement('div')
-                iframeContainer.className = 'iframe-container'
+                let recommendations = await (
+                    (query.includes('.com')) ? 
+                        fetch_recommend_from_song(query, 1, 1, 10) :
+                        fetch_recommend_from_text(query, 1, 10)
+                )
 
-                let iframe = document.createElement('iframe')
-                iframe.src = `https://youxube.com/watch?v=${item}`
-                iframe.style.width = '100%'
-                iframe.style.height = '100%'
-                iframe.scrolling = 'no'
-                iframe.frameBorder = '0'
+                playlist.innerHTML = ''
+                for (let i = 0; i < recommendations.length; i++) {
+                    let item = recommendations[i][0]
 
-                iframeContainer.appendChild(iframe)
-                playlist.appendChild(iframeContainer)
+                    let iframeContainer = document.createElement('div')
+                    iframeContainer.className = 'iframe-container'
+
+                    let iframe = document.createElement('iframe')
+                    iframe.src = `https://youxube.com/watch?v=${item}`
+                    iframe.style.width = '100%'
+                    iframe.style.height = '100%'
+                    iframe.scrolling = 'no'
+                    iframe.frameBorder = '0'
+
+                    iframeContainer.appendChild(iframe)
+                    playlist.appendChild(iframeContainer)
+                }
+
+                document.body.style.cursor = 'auto'
+                query_processing = false
+
             }
-
-            document.body.style.cursor = 'auto'
-            query_processing = false
-
         })
 
         let playlist = document.createElement('div')
