@@ -46,8 +46,8 @@
 
                 let recommendations = await (
                     (query.includes('.com')) ? 
-                        fetch_recommend_from_song(query, 1, 1, 10) :
-                        fetch_recommend_from_text(query, 1, 10)
+                        fetch_recommend_from_song(query, 1, 1, 16) :
+                        fetch_recommend_from_text(query, 1, 16)
                 )
 
                 playlist.innerHTML = ''
