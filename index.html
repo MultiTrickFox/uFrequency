@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>uFrequency.Ai</title>
+    <title>uFrequency.ai</title>
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 </head>
 <body style="
@@ -13,10 +13,64 @@
     ">
     <link rel="stylesheet" href="style.css">
 
-    <label for="username">Username:</label> <input type="password" id="username" name="username" onchange="username=this.value">
-    <label for="password">Password:</label> <input type="password" id="password" name="password" onchange="password=this.value">
+    <script>
 
-    <img src="assets/plan.jpeg" alt="My Plan">
+        let query_text = document.createElement('input')
+        document.body.appendChild(query_text)
+        query_text.type = 'text'
+        query_text.placeholder = 'Enter your query'
+
+        let query_button = document.createElement('button')
+        document.body.appendChild(query_button)
+        query_button.textContent = 'Search'
+        let query_processing = false
+        query_button.addEventListener('click', async function() {
+            if (query_processing) return
+            query_processing = true
+            document.body.style.cursor = 'wait'
+
+            let query = query_text.value
+            let recommendations = await (
+                (query.includes('www') || query.includes('http')) ? 
+                    fetch_recommend_from_song(query, 1, 1, 10) :
+                    fetch_recommend_from_text(query, 1, 10)
+            )
+
+            playlist.innerHTML = ''
+            for (let i = 0; i < recommendations.length; i++) {
+                let item = recommendations[i][0]
+
+                let iframeContainer = document.createElement('div')
+                iframeContainer.className = 'iframe-container'
+
+                let iframe = document.createElement('iframe')
+                iframe.src = `https://youxube.com/watch?v=${item}`
+                iframe.style.width = '100%'
+                iframe.style.height = '100%'
+                iframe.scrolling = 'no'
+                iframe.frameBorder = '0'
+
+                iframeContainer.appendChild(iframe)
+                playlist.appendChild(iframeContainer)
+            }
+
+            document.body.style.cursor = 'auto'
+            query_processing = false
+
+        })
+
+        let playlist = document.createElement('div')
+        document.body.appendChild(playlist)
+        playlist.className = 'playlist'
+        
+
+
+
+
+
+
+
+    </script>
 
     <script>
 
@@ -58,17 +112,7 @@
             //
 
             await fetch_get_playlists()
-            await fetch_remove_playlist(response_playlist_identifier)
-            await fetch_get_playlists()
-
-            //
-            
-            await fetch_insert_into_playlist('plistkey', ['deneme_song1', 'deneme_song2'], 1)
-            await fetch_get_playlists()
-
-            //
-
-            await fetch_remove_from_playlist('plistkey', ['deneme_song1', 'deneme_song2'])
+            await fetch_del_playlist(response_playlist_identifier)
             await fetch_get_playlists()
 
             //
@@ -188,58 +232,17 @@
             return response
         }
 
-        async function fetch_remove_playlist(identifier) {
+        async function fetch_del_playlist(identifier) {
             let xhr = new XMLHttpRequest()
             let response
             xhr.open("GET", "https://ufrequency.ai.ap.ngrok.io/playlist", true)
             xhr.setRequestHeader("username", username)
             xhr.setRequestHeader("password", password)
-            xhr.setRequestHeader("cmd", "remove")
+            xhr.setRequestHeader("cmd", "del")
             xhr.setRequestHeader("identifier", identifier)
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == XMLHttpRequest.DONE) {
-                    console.log('remove_playlist response:',xhr.responseText)
-                    response = JSON.parse(xhr.responseText).answer
-                }
-            }
-            xhr.send()
-            while (xhr.readyState != XMLHttpRequest.DONE) await sleep(.1)
-            return response
-        }
-
-        async function fetch_remove_from_playlist(identifier, contents) {
-            let xhr = new XMLHttpRequest()
-            let response
-            xhr.open("GET", "https://ufrequency.ai.ap.ngrok.io/playlist", true)
-            xhr.setRequestHeader("username", username)
-            xhr.setRequestHeader("password", password)
-            xhr.setRequestHeader("cmd", "remove_from")
-            xhr.setRequestHeader("identifier", identifier)
-            xhr.setRequestHeader("contents", contents)
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState == XMLHttpRequest.DONE) {
-                    console.log('remove_from_playlist response:',xhr.responseText)
-                    response = JSON.parse(xhr.responseText).answer
-                }
-            }
-            xhr.send()
-            while (xhr.readyState != XMLHttpRequest.DONE) await sleep(.1)
-            return response
-        }
-
-        async function fetch_insert_into_playlist(identifier, contents, index) {
-            let xhr = new XMLHttpRequest()
-            let response
-            xhr.open("GET", "https://ufrequency.ai.ap.ngrok.io/playlist", true)
-            xhr.setRequestHeader("username", username)
-            xhr.setRequestHeader("password", password)
-            xhr.setRequestHeader("cmd", "insert_into")
-            xhr.setRequestHeader("identifier", identifier)
-            xhr.setRequestHeader("contents", contents)
-            xhr.setRequestHeader("index", index)
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState == XMLHttpRequest.DONE) {
-                    console.log('insert_into_playlist response:',xhr.responseText)
+                    console.log('del_playlist response:',xhr.responseText)
                     response = JSON.parse(xhr.responseText).answer
                 }
             }
@@ -254,7 +257,7 @@
 
     <script>
 
-        test()
+        //test()
 
     </script>
 
