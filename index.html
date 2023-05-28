@@ -42,8 +42,6 @@
                 query_processing = true
                 document.body.style.cursor = 'wait'
 
-                if (query.includes('.com') && !query.includes('www.')) query = 'www.'+query
-
                 let recommendations = await (
                     (query.includes('.com')) ? 
                         fetch_recommend_from_song(query, 1, 1, 16) :
