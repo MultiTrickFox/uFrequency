@@ -100,7 +100,7 @@
                         )
 
                         playlist_contents = recommendations.map((e) => (e[0]))
-                        playlist_title = query.replace('https://','').replace('www.','').replace('youtube.com/watch?v=')
+                        playlist_title = query.replace('https://','').replace('www.','').replace('youtube.com/watch?v=','')
 
                         playlist.innerHTML = ''
                         for (let i = 0; i < recommendations.length; i++) {
