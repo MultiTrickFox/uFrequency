@@ -15,88 +15,281 @@
 
     <script>
 
-        let query_processing = false
+        // Apply CSS styles for vertical centering
+        document.body.style.display = "flex";
+        document.body.style.alignItems = "center";
+        document.body.style.justifyContent = "center";
 
-        let query_text = document.createElement('textarea')
-        document.body.appendChild(query_text)
-        query_text.type = 'text'
-        query_text.placeholder = 'Paste a Youtube URL and Hit Enter'
-        query_text.rows = 6
-        query_text.style.resize = 'none'
-        query_text.style.display = 'block'
-        query_text.style.width = '30%'
-        query_text.style.height = '30%'
-        query_text.style.margin = '2% auto 0'
-        query_text.style.textAlign = 'center'
-        query_text.style.paddingTop = '16px'
-        query_text.style.font = '8pt Quicksand'
+        //
 
-        query_text.addEventListener('input', async function() {
-            console.log('Text has changed:', query_text.value)
-            let query = query_text.value
-            if (query.includes('\n')) {
-                query = query.replace('\n','')
-                query_text.value = query
+        async function main() {
 
-                if (query_processing) return
-                query_processing = true
-                document.body.style.cursor = 'wait'
+            var last_popup
 
-                let recommendations = await (
-                    (query.includes('.com')) ? 
-                        fetch_recommend_from_song(query, 1, 1, 16) :
-                        fetch_recommend_from_text(query, 1, 16)
-                )
+            function create_popup(playlist_title, playlist_contents) {
 
-                playlist.innerHTML = ''
-                for (let i = 0; i < recommendations.length; i++) {
-                    let item = recommendations[i][0]
+                let query_processing = false
 
-                    let iframeContainer = document.createElement('div')
-                    iframeContainer.className = 'iframe-container'
+                let activitybar = document.createElement('div')
+                activitybar.style.width = '83%'
+                activitybar.style.height = '2.5%'
+                //activitybar.innerHTML = 'TEST'
+                let exitButton = document.createElement('button');
+                exitButton.style.font = '8pt Quicksand'
+                exitButton.innerHTML = 'X';
+                let saveButton = document.createElement('button');
+                saveButton.style.font = '8pt Quicksand'
+                saveButton.innerHTML = 'Save';
+                activitybar.appendChild(exitButton);
+                activitybar.appendChild(saveButton);
 
-                    let iframe = document.createElement('iframe')
-                    iframe.src = `https://youxube.com/watch?v=${item}`
-                    iframe.style.width = '100%'
-                    iframe.style.height = '100%'
-                    iframe.scrolling = 'no'
-                    iframe.frameBorder = '0'
+                saveButton.onclick = async function() {
+                    await fetch_set_playlist(playlist_title, playlist_contents)
+                    let button_open_playlist = document.createElement('button');
+                    playlists_overflow.appendChild(button_open_playlist)
+                    button_open_playlist.textContent = playlist_title
+                    button_open_playlist.style.textAlign = 'center'
+                    button_open_playlist.style.font = '12pt Quicksand'
+                    button_open_playlist.style.borderRadius = "8px"
+                    button_open_playlist.style.background = "black"
+                    button_open_playlist.style.border = "None"
+                    button_open_playlist.style.color = "white"
+                    button_open_playlist.style.margin = '1pt'
+                    button_open_playlist.addEventListener('click', function() {
+                        let popup = create_popup(playlist_title, playlist_contents)
+                        document.body.appendChild(popup)
+                    });
+                };
+                exitButton.addEventListener('click', function() {
+                    container_last_left = parseInt(container.style.left.replace('px',''))
+                    container_last_top = parseInt(container.style.top.replace('px',''))
+                    document.body.removeChild(container)
+                    container.innerHTML = ''
+                });
 
-                    iframe.style.width = '600px'
-                    iframe.style.height = '380px'
-                    iframe.style.margin = '0 auto'
-                    iframe.style.display = 'flex'
-                    iframe.style.justify_content = 'center'
-                    iframe.style.align_items = 'center'
+                let query_text = document.createElement('textarea')
+                //document.body.appendChild(query_text)
+                query_text.type = 'text'
+                query_text.placeholder = playlist_title==null ? 'Paste YouTubeURL or Write Text and Hit Enter \nor Drop an Audio File' : playlist_title
+                query_text.rows = 3//6
+                query_text.style.resize = 'none'
+                //query_text.style.display = 'block'
+                query_text.style.width = '84%'
+                query_text.style.height = '6%'
+                query_text.style.margin = '2% auto 0'
+                query_text.style.textAlign = 'center'
+                query_text.style.paddingTop = '6px'
+                query_text.style.font = '8pt Quicksand'
+                query_text.style.outline = 'none';
 
-                    iframeContainer.appendChild(iframe)
-                    playlist.appendChild(iframeContainer)
+                query_text.addEventListener('input', async function() {
+                    let query = query_text.value
+                    
+                    if (query.includes('\n')) {
+                        query = query.replace('\n','')
+                        query_text.value = query
+
+                        if (query_processing) return
+                        query_processing = true
+                        document.body.style.cursor = 'wait'
+
+                        let recommendations = await (
+                            (query.includes('.com')) ? 
+                                fetch_recommend_from_song(query, 1, 1, 12) :
+                                fetch_recommend_from_text(query, 1, 12)
+                        )
+
+                        playlist_contents = recommendations.map((e) => (e[0]))
+                        playlist_title = query.replace('https://','').replace('www.','').replace('youtube.com/watch?v=')
+
+                        playlist.innerHTML = ''
+                        for (let i = 0; i < recommendations.length; i++) {
+                            let item = recommendations[i][0]
+
+                            let iframeContainer = document.createElement('div')
+                            iframeContainer.className = 'iframe-container'
+
+                            let iframe = document.createElement('iframe')
+                            iframe.src = `https://youxube.com/watch?v=${item}`
+                            iframe.style.width = '100%'
+                            iframe.style.height = '100%'
+                            iframe.scrolling = 'no'
+                            iframe.frameBorder = '0'
+                            iframe.allowFullscreen = true
+
+                            iframe.style.width = '600px'
+                            iframe.style.height = '380px'
+                            iframe.style.margin = '0 auto'
+                            iframe.style.display = 'flex'
+                            iframe.style.justify_content = 'center'
+                            iframe.style.align_items = 'center'
+
+                            iframeContainer.appendChild(iframe)
+                            playlist.appendChild(iframeContainer)
+                        }
+
+                        document.body.style.cursor = 'auto'
+                        query_processing = false
+
+                    }
+                })
+
+                // let query_text_ = document.createElement('div')
+                // // query_text_.style.position = 'absolute'
+                // query_text_.appendChild(query_text)
+                // query_text = query_text_
+
+                let playlist = document.createElement('div')
+                //document.body.appendChild(playlist)
+                //playlist.style.position = 'fixed'
+                //playlist.style.top = '55%'
+                //playlist.style.left = '50%'
+                //playlist.style.transform = 'translate(-50%, -50%)'
+                playlist.style.width = '85%'
+                playlist.style.height = '72%'
+                playlist.style.backgroundColor = '#000000'
+                playlist.style.overflowY = 'scroll'
+                playlist.style.display = 'block'
+
+                if (playlist_contents!=null) {
+                    playlist.innerHTML = ''
+                    for (let i = 0; i < playlist_contents.length; i++) {
+                        let item = playlist_contents[i]
+
+                        console.log('item:',item)
+
+                        let iframeContainer = document.createElement('div')
+                        iframeContainer.className = 'iframe-container'
+
+                        let iframe = document.createElement('iframe')
+                        iframe.src = `https://youxube.com/watch?v=${item}`
+                        iframe.style.width = '100%'
+                        iframe.style.height = '100%'
+                        iframe.scrolling = 'no'
+                        iframe.frameBorder = '0'
+                        iframe.allowFullscreen = true
+
+                        iframe.style.width = '600px'
+                        iframe.style.height = '380px'
+                        iframe.style.margin = '0 auto'
+                        iframe.style.display = 'flex'
+                        iframe.style.justify_content = 'center'
+                        iframe.style.align_items = 'center'
+
+                        iframeContainer.appendChild(iframe)
+                        playlist.appendChild(iframeContainer)
+                    }
+                }
+                
+                let container = document.createElement('div');
+                container.style.position = 'fixed';
+                container.style.top = '0';
+                container.style.left = '0';
+                container.style.width = '100%';
+                container.style.height = '100%';
+                //container.style.zIndex = '9999';
+                container.append(activitybar)
+                container.appendChild(query_text);
+                container.appendChild(playlist);
+                document.body.appendChild(container);
+
+                let posX = 0, posY = 0;
+                let posX_ = 0, posY_ = 0;
+                let isDragging = false;
+
+                container.addEventListener("mousedown", function(event) {
+                    isDragging = true;
+                    posX = event.clientX - container.offsetLeft;
+                    posY = event.clientY - container.offsetTop;
+                    posX_ = event.clientX - playlist.offsetLeft;
+                    posY_ = event.clientY - playlist.offsetTop;
+                });
+
+                container.addEventListener("mousemove", function(event) {
+                    if (isDragging) {
+                    let leftPos = event.clientX - posX;
+                    let topPos = event.clientY - posY;
+                    container.style.left = leftPos + "px";
+                    container.style.top = topPos + "px";
+                    let leftPos_ = event.clientX - posX_;
+                    let topPos_ = event.clientY - posY_;
+                    playlist.style.left = leftPos_ + "px";
+                    playlist.style.top = topPos_ + "px";
+                    }
+                });
+                
+                container.addEventListener("mouseup", function() {
+                    isDragging = false;
+                });
+
+                container.style.width = '740px'
+                container.style.height = '600px'
+                container.style.top = '7%'
+                if (last_popup==null) {
+                    container.style.left = '116px'
+                    container.style.top = '52px'
+                }
+                else {
+                    container.style.left = parseInt(last_popup.style.left.replace('px',''))+96+'px'
+                    container.style.top = last_popup.style.top
                 }
 
-                document.body.style.cursor = 'auto'
-                query_processing = false
+                last_popup = container
+
+                return container
 
             }
-        })
+            
+            //
 
-        let playlist = document.createElement('div')
-        document.body.appendChild(playlist)
-        playlist.style.position = 'fixed'
-        playlist.style.top = '55%'
-        playlist.style.left = '50%'
-        playlist.style.transform = 'translate(-50%, -50%)'
-        playlist.style.width = '85%'
-        playlist.style.height = '80%'
-        playlist.style.backgroundColor = '#000000'
-        playlist.style.overflowY = 'scroll'
-        playlist.style.display = 'block'
+            let playlists_overflow = document.createElement('div')
+            document.body.appendChild(playlists_overflow)
+            playlists_overflow.style.overflowX = 'auto'
+            playlists_overflow.style.whiteSpace = 'nowrap'
+
+            let button_spawn_playlist = document.createElement('button');
+            //document.body.appendChild(button_spawn_playlist);
+            button_spawn_playlist.textContent = "New Playlist"//+i;
+            button_spawn_playlist.style.textAlign = 'center'
+            button_spawn_playlist.style.font = '12pt Quicksand'
+            button_spawn_playlist.style.borderRadius = "8px"
+            button_spawn_playlist.style.background = "black"
+            button_spawn_playlist.style.border = "None"
+            button_spawn_playlist.style.color = "white"
+            button_spawn_playlist.style.margin = '1pt'
+            button_spawn_playlist.addEventListener('click', function() {
+                let popup = create_popup(null, null)
+                document.body.appendChild(popup)
+            });
+
+            playlists_overflow.appendChild(button_spawn_playlist)
+            
+            // todo: fetch playlists, add as buttons, that pop up playlist container (with given values)
+
+            let playlists = await fetch_get_playlists()
+            // console.log('current playlists:\n',response_playlists)
+            // console.log('an example playlist:\n',response_playlists['plistkey'])
+            // console.log('an example playlist query:\n',response_playlists['plistkey'][0]) // the initial query
+            // console.log('an example playlist items:\n',response_playlists['plistkey'][1]) // the songs list
+
+            for (let [key, value] of Object.entries(playlists)) {
+                let button_open_playlist = document.createElement('button');
+                playlists_overflow.appendChild(button_open_playlist)
+                button_open_playlist.textContent = value[0];
+                button_open_playlist.style.textAlign = 'center'
+                button_open_playlist.style.font = '12pt Quicksand'
+                button_open_playlist.style.borderRadius = "8px"
+                button_open_playlist.style.background = "black"
+                button_open_playlist.style.border = "None"
+                button_open_playlist.style.color = "white"
+                button_open_playlist.style.margin = '1pt'
+                button_open_playlist.addEventListener('click', function() {
+                    let popup = create_popup(value[0], value[1])
+                    document.body.appendChild(popup)
+                });
+            }
         
-
-
-
-
-
-
+        }
 
     </script>
 
@@ -106,12 +299,6 @@
         var password = 'none'
 
         //
-
-        async function main() {
-            
-            
-
-        }
 
         async function test() {
 
@@ -248,7 +435,7 @@
             xhr.setRequestHeader("password", password)
             xhr.setRequestHeader("cmd", "set")
             xhr.setRequestHeader("query", query)
-            xhr.setRequestHeader("contents", contents)
+            xhr.setRequestHeader("contents", JSON.stringify(contents))
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == XMLHttpRequest.DONE) {
                     console.log('set_playlist response:',xhr.responseText)
@@ -286,6 +473,7 @@
     <script>
 
         //test()
+        main()
 
     </script>
 
