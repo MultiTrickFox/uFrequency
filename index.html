@@ -39,10 +39,8 @@
                 exitButton.style.font = '8pt Quicksand'
                 exitButton.innerHTML = 'X'
                 exitButton.addEventListener('click', function() {
-                    container_last_left = parseInt(container.style.left.replace('px',''))
-                    container_last_top = parseInt(container.style.top.replace('px',''))
-                    document.body.removeChild(container)
-                    container.innerHTML = ''
+                    document.body.removeChild(popup)
+                    popup.innerHTML = ''
                 })
                 
                 let saveButton = document.createElement('button')
@@ -112,9 +110,6 @@
                         for (let i = 0; i < recommendations.length; i++) {
                             let item = recommendations[i][0]
 
-                            let iframeContainer = document.createElement('div')
-                            iframeContainer.className = 'iframe-container'
-
                             let iframe = document.createElement('iframe')
                             iframe.src = `https://youxube.com/watch?v=${item}`
                             iframe.style.width = '100%'
@@ -122,16 +117,13 @@
                             iframe.scrolling = 'no'
                             iframe.frameBorder = '0'
                             iframe.allowFullscreen = true
-
                             iframe.style.width = '600px'
                             iframe.style.height = '380px'
                             iframe.style.margin = '0 auto'
                             iframe.style.display = 'flex'
                             iframe.style.justify_content = 'center'
                             iframe.style.align_items = 'center'
-
-                            iframeContainer.appendChild(iframe)
-                            playlist.appendChild(iframeContainer)
+                            playlist.appendChild(iframe)
                         }
 
                         document.body.style.cursor = 'auto'
@@ -151,11 +143,6 @@
                     for (let i = 0; i < playlist_contents.length; i++) {
                         let item = playlist_contents[i]
 
-                        console.log('item:',item)
-
-                        let iframeContainer = document.createElement('div')
-                        iframeContainer.className = 'iframe-container'
-
                         let iframe = document.createElement('iframe')
                         iframe.src = `https://youxube.com/watch?v=${item}`
                         iframe.style.width = '100%'
@@ -163,16 +150,13 @@
                         iframe.scrolling = 'no'
                         iframe.frameBorder = '0'
                         iframe.allowFullscreen = true
-
                         iframe.style.width = '600px'
                         iframe.style.height = '380px'
                         iframe.style.margin = '0 auto'
                         iframe.style.display = 'flex'
                         iframe.style.justify_content = 'center'
                         iframe.style.align_items = 'center'
-
-                        iframeContainer.appendChild(iframe)
-                        playlist.appendChild(iframeContainer)
+                        playlist.appendChild(iframe)
                     }
                 }
                 
@@ -180,16 +164,19 @@
                 popup.style.position = 'fixed'
                 popup.style.top = '0'
                 popup.style.left = '0'
-                popup.style.width = '100%'
-                popup.style.height = '100%'
+                popup.style.width = '720px'
+                popup.style.height = '600px'
+                popup.style.left = last_popup==null ? '116px' : parseInt(last_popup.style.left.replace('px',''))+96+'px'
+                popup.style.top = last_popup==null ? '52px' : last_popup.style.top
+
                 popup.append(activitybar)
                 popup.appendChild(query_text)
                 popup.appendChild(playlist)
                 document.body.appendChild(popup)
 
-                let posX = 0, posY = 0;
-                let posX_ = 0, posY_ = 0;
-                let isDragging = false;
+                let posX = 0, posY = 0
+                let posX_ = 0, posY_ = 0
+                let isDragging = false
 
                 popup.addEventListener("mousedown", function(event) {
                     isDragging = true;
@@ -198,7 +185,6 @@
                     posX_ = event.clientX - playlist.offsetLeft
                     posY_ = event.clientY - playlist.offsetTop
                 })
-
                 popup.addEventListener("mousemove", function(event) {
                     if (isDragging) {
                     let leftPos = event.clientX - posX
@@ -211,22 +197,9 @@
                     playlist.style.top = topPos_ + "px"
                     }
                 })
-                
                 popup.addEventListener("mouseup", function() {
                     isDragging = false
                 })
-
-                popup.style.width = '720px'
-                popup.style.height = '600px'
-                popup.style.top = '7%'
-                if (last_popup==null) {
-                    popup.style.left = '116px'
-                    popup.style.top = '52px'
-                }
-                else {
-                    popup.style.left = parseInt(last_popup.style.left.replace('px',''))+96+'px'
-                    popup.style.top = last_popup.style.top
-                }
 
                 last_popup = popup
 
@@ -242,6 +215,7 @@
             playlists_overflow.style.whiteSpace = 'nowrap'
 
             let button_spawn_playlist = document.createElement('button')
+            playlists_overflow.appendChild(button_spawn_playlist)
             button_spawn_playlist.textContent = 'New Playlist'
             button_spawn_playlist.style.textAlign = 'center'
             button_spawn_playlist.style.font = '12pt Quicksand'
@@ -254,8 +228,6 @@
                 let popup = create_popup(null, null)
                 document.body.appendChild(popup)
             })
-
-            playlists_overflow.appendChild(button_spawn_playlist)
             
             let playlists = await fetch_get_playlists()
             for (let [key, value] of Object.entries(playlists)) {
