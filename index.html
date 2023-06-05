@@ -26,18 +26,27 @@
 
             var last_popup
 
+            // total width = '630px'
+            // total height = '724px'
+
             function create_popup(playlist_title, playlist_contents) {
 
                 let request_processing = false
 
-                let activitybar = document.createElement('div')
-                activitybar.style.width = '83%'
-                activitybar.style.height = '2.5%'
+                let activitybar = document.createElement('div')         // TODO: work with pixels everywhere
+                activitybar.style.width = '630px'                         // wrt pixel of the "popup"
+                activitybar.style.height = '18px'
+                activitybar.style.margin = '0px 4px'
+                activitybar.style.marginTop = '2px'
 
                 let exitButton = document.createElement('button')
                 activitybar.appendChild(exitButton)
                 exitButton.style.font = '8pt Quicksand'
-                exitButton.innerHTML = 'X'
+                exitButton.innerHTML = '\u2717'
+                exitButton.style.color = 'white'
+                exitButton.style.border = 'none'
+                exitButton.style.backgroundColor = 'black'
+                exitButton.style.borderRadius = '6px'
                 exitButton.addEventListener('click', function() {
                     document.body.removeChild(popup)
                     popup.innerHTML = ''
@@ -46,7 +55,11 @@
                 let saveButton = document.createElement('button')
                 activitybar.appendChild(saveButton)
                 saveButton.style.font = '8pt Quicksand'
-                saveButton.innerHTML = 'Save'
+                saveButton.innerHTML = '\u2713'
+                saveButton.style.color = 'white'
+                saveButton.style.border = 'none'
+                saveButton.style.backgroundColor = 'black'
+                saveButton.style.borderRadius = '6px'
                 saveButton.onclick = async function() {
                     if (playlist_contents == null) return
 
@@ -60,7 +73,7 @@
                     button_open_playlist.textContent = playlist_title
                     button_open_playlist.style.textAlign = 'center'
                     button_open_playlist.style.font = '12pt Quicksand'
-                    button_open_playlist.style.borderRadius = '8px'
+                    button_open_playlist.style.borderRadius = '6px'
                     button_open_playlist.style.background = 'black'
                     button_open_playlist.style.border = 'None'
                     button_open_playlist.style.color = 'white'
@@ -76,16 +89,21 @@
 
                 let query_text = document.createElement('textarea')
                 query_text.type = 'text'
-                query_text.placeholder = playlist_title==null ? 'Paste YouTube URL or Type Text Query and Hit Enter \nor Drop an Audio File' : playlist_title
+                query_text.style.whiteSpace = 'pre'
+                query_text.placeholder = playlist_title==null ? '1- Paste a YouTube URL and Hit Enter\n2- Type a Query and Hit Enter\n3- Drag Drop an Audio File' : playlist_title
                 query_text.rows = 3//6
                 query_text.style.resize = 'none'
-                query_text.style.width = '610px'
-                query_text.style.height = '36px'
-                query_text.style.margin = '2px 4px'
+                query_text.style.width = '616px'
+                query_text.style.height = '42px'
+                query_text.style.margin = '0px 4px'
+                query_text.style.marginTop = '6px'
                 query_text.style.textAlign = 'center'
                 query_text.style.paddingTop = '6px'
+                query_text.style.paddingBot = '6px'
                 query_text.style.font = '8pt Quicksand'
                 query_text.style.outline = 'none'
+                query_text.style.overflowY = 'hidden'
+                query_text.style.whiteSpace = 'pre-wrap'
                 query_text.addEventListener('input', async function() {
                     let query = query_text.value
                     
@@ -187,11 +205,12 @@
                 })
 
                 let playlist = document.createElement('div')
-                playlist.style.width = '630px'
-                playlist.style.height = '620px'
+                playlist.style.width = '622px'
+                playlist.style.height = '630px'
                 playlist.style.backgroundColor = '#000000'
                 playlist.style.overflowY = 'scroll'
                 playlist.style.display = 'block'
+                playlist.style.paddingLeft = '8px'
 
                 if (playlist_contents!=null) {
                     playlist.innerHTML = ''
@@ -217,10 +236,11 @@
                 
                 let popup = document.createElement('div')
                 popup.className = 'popup'
-                popup.style.backgroundColor = 'rgba(0, 0, 0, 0.8)'
+                popup.style.backgroundColor = 'rgba(0, 0, 0, 0.86)'
                 popup.style.position = 'fixed'
                 popup.style.width = '630px'
-                popup.style.height = '720px'
+                popup.style.height = '724px'
+                popup.style.borderRadius = '6px'
                 popup.style.left = last_popup==null ? '116px' : parseInt(last_popup.style.left.replace('px',''))+96+'px'
                 popup.style.top = last_popup==null ? '96px' : last_popup.style.top
                 let maxZIndex = 0
@@ -253,11 +273,11 @@
                         const zIndex = parseInt(window.getComputedStyle(popup).getPropertyValue('z-index'))
                         if (zIndex > maxZIndex) maxZIndex = zIndex
                     })
-                    popup.style.zIndex = maxZIndex + 1
                     for (let i = 0; i < popups.length; i++) {
                         let otherPopup = popups[i]
-                        if (otherPopup !== popup) otherPopup.style.zIndex -=1
+                        if (otherPopup.zIndex > popup.zIndex) otherPopup.style.zIndex -=1
                     }
+                    popup.style.zIndex = maxZIndex + 1
                 })
                 popup.addEventListener("mousemove", function(event) {
                     if (isDragging) {
@@ -304,7 +324,7 @@
             button_spawn_playlist.textContent = 'New Playlist'
             button_spawn_playlist.style.textAlign = 'center'
             button_spawn_playlist.style.font = '12pt Quicksand'
-            button_spawn_playlist.style.borderRadius = '8px'
+            button_spawn_playlist.style.borderRadius = '6px'
             button_spawn_playlist.style.background = 'black'
             button_spawn_playlist.style.border = 'None'
             button_spawn_playlist.style.color = 'white'
@@ -321,7 +341,7 @@
                 button_open_playlist.textContent = value[0]
                 button_open_playlist.style.textAlign = 'center'
                 button_open_playlist.style.font = '12pt Quicksand'
-                button_open_playlist.style.borderRadius = '8px'
+                button_open_playlist.style.borderRadius = '6px'
                 button_open_playlist.style.background = 'black'
                 button_open_playlist.style.border = 'None'
                 button_open_playlist.style.color = 'white'
