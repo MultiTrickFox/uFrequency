@@ -27,14 +27,14 @@
             var last_popup
 
             // total width = '630px'
-            // total height = '724px'
+            // total height = '730px'
 
             function create_popup(playlist_title, playlist_contents) {
 
                 let request_processing = false
 
-                let activitybar = document.createElement('div')         // TODO: work with pixels everywhere
-                activitybar.style.width = '630px'                         // wrt pixel of the "popup"
+                let activitybar = document.createElement('div') 
+                activitybar.style.width = '630px'               
                 activitybar.style.height = '18px'
                 activitybar.style.margin = '0px 4px'
                 activitybar.style.marginTop = '2px'
@@ -93,9 +93,10 @@
                 query_text.placeholder = playlist_title==null ? '1- Paste a YouTube URL and Hit Enter\n2- Type a Query and Hit Enter\n3- Drag Drop an Audio File' : playlist_title
                 query_text.rows = 3//6
                 query_text.style.resize = 'none'
-                query_text.style.width = '616px'
+                query_text.style.width = '596px'
                 query_text.style.height = '42px'
-                query_text.style.margin = '0px 4px'
+                query_text.style.marginLeft = '13px'
+                query_text.style.marginRight = '15px'
                 query_text.style.marginTop = '6px'
                 query_text.style.textAlign = 'center'
                 query_text.style.paddingTop = '6px'
@@ -211,6 +212,7 @@
                 playlist.style.overflowY = 'scroll'
                 playlist.style.display = 'block'
                 playlist.style.paddingLeft = '8px'
+                playlist.style.marginTop = '4px'
 
                 if (playlist_contents!=null) {
                     playlist.innerHTML = ''
@@ -239,7 +241,7 @@
                 popup.style.backgroundColor = 'rgba(0, 0, 0, 0.86)'
                 popup.style.position = 'fixed'
                 popup.style.width = '630px'
-                popup.style.height = '724px'
+                popup.style.height = '730px'
                 popup.style.borderRadius = '6px'
                 popup.style.left = last_popup==null ? '116px' : parseInt(last_popup.style.left.replace('px',''))+96+'px'
                 popup.style.top = last_popup==null ? '96px' : last_popup.style.top
