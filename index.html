@@ -27,7 +27,7 @@
             var last_popup
 
             // total width = '630px'
-            // total height = '730px'
+            // total height = '732px'
 
             function create_popup(playlist_title, playlist_contents) {
 
@@ -37,10 +37,11 @@
                 activitybar.style.width = '630px'               
                 activitybar.style.height = '18px'
                 activitybar.style.margin = '0px 4px'
-                activitybar.style.marginTop = '2px'
+                activitybar.style.marginTop = '4px'
 
                 let exitButton = document.createElement('button')
                 activitybar.appendChild(exitButton)
+                exitButton.style.width = '26px'
                 exitButton.style.font = '8pt Quicksand'
                 exitButton.innerHTML = '\u2717'
                 exitButton.style.color = 'white'
@@ -54,6 +55,7 @@
                 
                 let saveButton = document.createElement('button')
                 activitybar.appendChild(saveButton)
+                saveButton.style.width = '26px'
                 saveButton.style.font = '8pt Quicksand'
                 saveButton.innerHTML = '\u2713'
                 saveButton.style.color = 'white'
@@ -241,7 +243,7 @@
                 popup.style.backgroundColor = 'rgba(0, 0, 0, 0.86)'
                 popup.style.position = 'fixed'
                 popup.style.width = '630px'
-                popup.style.height = '730px'
+                popup.style.height = '732px'
                 popup.style.borderRadius = '6px'
                 popup.style.left = last_popup==null ? '116px' : parseInt(last_popup.style.left.replace('px',''))+96+'px'
                 popup.style.top = last_popup==null ? '96px' : last_popup.style.top
