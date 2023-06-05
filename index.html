@@ -28,60 +28,66 @@
 
             function create_popup(playlist_title, playlist_contents) {
 
-                let query_processing = false
+                let request_processing = false
 
                 let activitybar = document.createElement('div')
                 activitybar.style.width = '83%'
                 activitybar.style.height = '2.5%'
-                //activitybar.innerHTML = 'TEST'
-                let exitButton = document.createElement('button');
-                exitButton.style.font = '8pt Quicksand'
-                exitButton.innerHTML = 'X';
-                let saveButton = document.createElement('button');
-                saveButton.style.font = '8pt Quicksand'
-                saveButton.innerHTML = 'Save';
-                activitybar.appendChild(exitButton);
-                activitybar.appendChild(saveButton);
 
+                let exitButton = document.createElement('button')
+                activitybar.appendChild(exitButton)
+                exitButton.style.font = '8pt Quicksand'
+                exitButton.innerHTML = 'X'
+                exitButton.addEventListener('click', function() {
+                    container_last_left = parseInt(container.style.left.replace('px',''))
+                    container_last_top = parseInt(container.style.top.replace('px',''))
+                    document.body.removeChild(container)
+                    container.innerHTML = ''
+                })
+                
+                let saveButton = document.createElement('button')
+                activitybar.appendChild(saveButton)
+                saveButton.style.font = '8pt Quicksand'
+                saveButton.innerHTML = 'Save'
                 saveButton.onclick = async function() {
+                    if (playlist_contents == null) return
+
+                    if (request_processing) return
+                    request_processing = true
+                    document.body.style.cursor = 'wait'
+
                     await fetch_set_playlist(playlist_title, playlist_contents)
                     let button_open_playlist = document.createElement('button');
                     playlists_overflow.appendChild(button_open_playlist)
                     button_open_playlist.textContent = playlist_title
                     button_open_playlist.style.textAlign = 'center'
                     button_open_playlist.style.font = '12pt Quicksand'
-                    button_open_playlist.style.borderRadius = "8px"
-                    button_open_playlist.style.background = "black"
-                    button_open_playlist.style.border = "None"
-                    button_open_playlist.style.color = "white"
+                    button_open_playlist.style.borderRadius = '8px'
+                    button_open_playlist.style.background = 'black'
+                    button_open_playlist.style.border = 'None'
+                    button_open_playlist.style.color = 'white'
                     button_open_playlist.style.margin = '1pt'
                     button_open_playlist.addEventListener('click', function() {
                         let popup = create_popup(playlist_title, playlist_contents)
                         document.body.appendChild(popup)
-                    });
-                };
-                exitButton.addEventListener('click', function() {
-                    container_last_left = parseInt(container.style.left.replace('px',''))
-                    container_last_top = parseInt(container.style.top.replace('px',''))
-                    document.body.removeChild(container)
-                    container.innerHTML = ''
-                });
+                    })
+
+                    document.body.style.cursor = 'auto'
+                    request_processing = false
+                }
 
                 let query_text = document.createElement('textarea')
-                //document.body.appendChild(query_text)
                 query_text.type = 'text'
-                query_text.placeholder = playlist_title==null ? 'Paste YouTubeURL or Write Text and Hit Enter \nor Drop an Audio File' : playlist_title
+                query_text.placeholder = playlist_title==null ? 'Paste YouTube_URL or Type Text and Hit Enter \nor Drop an Audio File' : playlist_title
                 query_text.rows = 3//6
                 query_text.style.resize = 'none'
-                //query_text.style.display = 'block'
                 query_text.style.width = '84%'
                 query_text.style.height = '6%'
                 query_text.style.margin = '2% auto 0'
                 query_text.style.textAlign = 'center'
                 query_text.style.paddingTop = '6px'
                 query_text.style.font = '8pt Quicksand'
-                query_text.style.outline = 'none';
-
+                query_text.style.outline = 'none'
                 query_text.addEventListener('input', async function() {
                     let query = query_text.value
                     
@@ -89,8 +95,8 @@
                         query = query.replace('\n','')
                         query_text.value = query
 
-                        if (query_processing) return
-                        query_processing = true
+                        if (request_processing) return
+                        request_processing = true
                         document.body.style.cursor = 'wait'
 
                         let recommendations = await (
@@ -129,22 +135,11 @@
                         }
 
                         document.body.style.cursor = 'auto'
-                        query_processing = false
-
+                        request_processing = false
                     }
                 })
 
-                // let query_text_ = document.createElement('div')
-                // // query_text_.style.position = 'absolute'
-                // query_text_.appendChild(query_text)
-                // query_text = query_text_
-
                 let playlist = document.createElement('div')
-                //document.body.appendChild(playlist)
-                //playlist.style.position = 'fixed'
-                //playlist.style.top = '55%'
-                //playlist.style.left = '50%'
-                //playlist.style.transform = 'translate(-50%, -50%)'
                 playlist.style.width = '85%'
                 playlist.style.height = '72%'
                 playlist.style.backgroundColor = '#000000'
@@ -181,62 +176,61 @@
                     }
                 }
                 
-                let container = document.createElement('div');
-                container.style.position = 'fixed';
-                container.style.top = '0';
-                container.style.left = '0';
-                container.style.width = '100%';
-                container.style.height = '100%';
-                //container.style.zIndex = '9999';
-                container.append(activitybar)
-                container.appendChild(query_text);
-                container.appendChild(playlist);
-                document.body.appendChild(container);
+                let popup = document.createElement('div')
+                popup.style.position = 'fixed'
+                popup.style.top = '0'
+                popup.style.left = '0'
+                popup.style.width = '100%'
+                popup.style.height = '100%'
+                popup.append(activitybar)
+                popup.appendChild(query_text)
+                popup.appendChild(playlist)
+                document.body.appendChild(popup)
 
                 let posX = 0, posY = 0;
                 let posX_ = 0, posY_ = 0;
                 let isDragging = false;
 
-                container.addEventListener("mousedown", function(event) {
+                popup.addEventListener("mousedown", function(event) {
                     isDragging = true;
-                    posX = event.clientX - container.offsetLeft;
-                    posY = event.clientY - container.offsetTop;
-                    posX_ = event.clientX - playlist.offsetLeft;
-                    posY_ = event.clientY - playlist.offsetTop;
-                });
+                    posX = event.clientX - popup.offsetLeft
+                    posY = event.clientY - popup.offsetTop
+                    posX_ = event.clientX - playlist.offsetLeft
+                    posY_ = event.clientY - playlist.offsetTop
+                })
 
-                container.addEventListener("mousemove", function(event) {
+                popup.addEventListener("mousemove", function(event) {
                     if (isDragging) {
-                    let leftPos = event.clientX - posX;
-                    let topPos = event.clientY - posY;
-                    container.style.left = leftPos + "px";
-                    container.style.top = topPos + "px";
-                    let leftPos_ = event.clientX - posX_;
-                    let topPos_ = event.clientY - posY_;
-                    playlist.style.left = leftPos_ + "px";
-                    playlist.style.top = topPos_ + "px";
+                    let leftPos = event.clientX - posX
+                    let topPos = event.clientY - posY
+                    popup.style.left = leftPos + "px"
+                    popup.style.top = topPos + "px"
+                    let leftPos_ = event.clientX - posX_
+                    let topPos_ = event.clientY - posY_
+                    playlist.style.left = leftPos_ + "px"
+                    playlist.style.top = topPos_ + "px"
                     }
-                });
+                })
                 
-                container.addEventListener("mouseup", function() {
-                    isDragging = false;
-                });
+                popup.addEventListener("mouseup", function() {
+                    isDragging = false
+                })
 
-                container.style.width = '720px'
-                container.style.height = '600px'
-                container.style.top = '7%'
+                popup.style.width = '720px'
+                popup.style.height = '600px'
+                popup.style.top = '7%'
                 if (last_popup==null) {
-                    container.style.left = '116px'
-                    container.style.top = '52px'
+                    popup.style.left = '116px'
+                    popup.style.top = '52px'
                 }
                 else {
-                    container.style.left = parseInt(last_popup.style.left.replace('px',''))+96+'px'
-                    container.style.top = last_popup.style.top
+                    popup.style.left = parseInt(last_popup.style.left.replace('px',''))+96+'px'
+                    popup.style.top = last_popup.style.top
                 }
 
-                last_popup = container
+                last_popup = popup
 
-                return container
+                return popup
 
             }
             
@@ -247,46 +241,38 @@
             playlists_overflow.style.overflowX = 'auto'
             playlists_overflow.style.whiteSpace = 'nowrap'
 
-            let button_spawn_playlist = document.createElement('button');
-            //document.body.appendChild(button_spawn_playlist);
-            button_spawn_playlist.textContent = "New Playlist"//+i;
+            let button_spawn_playlist = document.createElement('button')
+            button_spawn_playlist.textContent = 'New Playlist'
             button_spawn_playlist.style.textAlign = 'center'
             button_spawn_playlist.style.font = '12pt Quicksand'
-            button_spawn_playlist.style.borderRadius = "8px"
-            button_spawn_playlist.style.background = "black"
-            button_spawn_playlist.style.border = "None"
-            button_spawn_playlist.style.color = "white"
+            button_spawn_playlist.style.borderRadius = '8px'
+            button_spawn_playlist.style.background = 'black'
+            button_spawn_playlist.style.border = 'None'
+            button_spawn_playlist.style.color = 'white'
             button_spawn_playlist.style.margin = '1pt'
             button_spawn_playlist.addEventListener('click', function() {
                 let popup = create_popup(null, null)
                 document.body.appendChild(popup)
-            });
+            })
 
             playlists_overflow.appendChild(button_spawn_playlist)
             
-            // todo: fetch playlists, add as buttons, that pop up playlist container (with given values)
-
             let playlists = await fetch_get_playlists()
-            // console.log('current playlists:\n',response_playlists)
-            // console.log('an example playlist:\n',response_playlists['plistkey'])
-            // console.log('an example playlist query:\n',response_playlists['plistkey'][0]) // the initial query
-            // console.log('an example playlist items:\n',response_playlists['plistkey'][1]) // the songs list
-
             for (let [key, value] of Object.entries(playlists)) {
                 let button_open_playlist = document.createElement('button');
                 playlists_overflow.appendChild(button_open_playlist)
-                button_open_playlist.textContent = value[0];
+                button_open_playlist.textContent = value[0]
                 button_open_playlist.style.textAlign = 'center'
                 button_open_playlist.style.font = '12pt Quicksand'
-                button_open_playlist.style.borderRadius = "8px"
-                button_open_playlist.style.background = "black"
-                button_open_playlist.style.border = "None"
-                button_open_playlist.style.color = "white"
+                button_open_playlist.style.borderRadius = '8px'
+                button_open_playlist.style.background = 'black'
+                button_open_playlist.style.border = 'None'
+                button_open_playlist.style.color = 'white'
                 button_open_playlist.style.margin = '1pt'
                 button_open_playlist.addEventListener('click', function() {
                     let popup = create_popup(value[0], value[1])
                     document.body.appendChild(popup)
-                });
+                })
             }
         
         }
