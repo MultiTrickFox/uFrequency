@@ -15,10 +15,10 @@
 
     <script>
 
-        // Apply CSS styles for vertical centering
-        document.body.style.display = "flex";
-        document.body.style.alignItems = "center";
-        document.body.style.justifyContent = "center";
+        // Apply CSS styles for global vertical centering
+        document.body.style.display = "flex"
+        document.body.style.alignItems = "center"
+        document.body.style.justifyContent = "center"
 
         //
 
@@ -55,7 +55,7 @@
                     document.body.style.cursor = 'wait'
 
                     await fetch_set_playlist(playlist_title, playlist_contents)
-                    let button_open_playlist = document.createElement('button');
+                    let button_open_playlist = document.createElement('button')
                     playlists_overflow.appendChild(button_open_playlist)
                     button_open_playlist.textContent = playlist_title
                     button_open_playlist.style.textAlign = 'center'
@@ -76,7 +76,7 @@
 
                 let query_text = document.createElement('textarea')
                 query_text.type = 'text'
-                query_text.placeholder = playlist_title==null ? 'Paste YouTube_URL or Type Text and Hit Enter \nor Drop an Audio File' : playlist_title
+                query_text.placeholder = playlist_title==null ? 'Paste YouTube URL or Text Query and Hit Enter \nor Drop an Audio File' : playlist_title
                 query_text.rows = 3//6
                 query_text.style.resize = 'none'
                 query_text.style.width = '84%'
@@ -130,6 +130,61 @@
                         request_processing = false
                     }
                 })
+                query_text.addEventListener('dragover', function(event) {
+                    event.preventDefault()
+                    query_text.style.background = 'lightgray'
+                })
+                query_text.addEventListener('dragleave', function(event) {
+                    event.preventDefault()
+                    query_text.style.background = 'white'
+                })
+                query_text.addEventListener('drop', async function(event) {
+                    event.preventDefault()
+                    query_text.style.background = 'white'
+
+                    if (request_processing) return
+                    request_processing = true
+                    document.body.style.cursor = 'wait'
+
+                    for (let file of event.dataTransfer.files) {
+                        let filename = file.name
+                        playlist_title = filename
+                        query_text.placeholder = playlist_title
+
+                        let reader = new FileReader()
+                        let reader_result = null
+                        reader.onload = function(event) { reader_result = event.target.result }
+                        reader.readAsArrayBuffer(file)
+                        while (reader_result == null) await sleep(.1)
+
+                        let recommendations = await fetch_recommend_from_audio(new Uint8Array(reader_result), `${username}-${filename}`, 1, 1, 10)
+
+                        playlist_contents = recommendations.map((e) => (e[0]))
+                        for (let i = 0; i < playlist_contents.length; i++) {
+                            let item = playlist_contents[i]
+
+                            let iframe = document.createElement('iframe')
+                            iframe.src = `https://youxube.com/watch?v=${item}`
+                            iframe.style.width = '100%'
+                            iframe.style.height = '100%'
+                            iframe.scrolling = 'no'
+                            iframe.frameBorder = '0'
+                            iframe.allowFullscreen = true
+                            iframe.style.width = '600px'
+                            iframe.style.height = '380px'
+                            iframe.style.margin = '0 auto'
+                            iframe.style.display = 'flex'
+                            iframe.style.justify_content = 'center'
+                            iframe.style.align_items = 'center'
+                            playlist.appendChild(iframe)
+                        }
+                        
+                    }
+                
+                    request_processing = false
+                    document.body.style.cursor = 'auto'
+
+                })
 
                 let playlist = document.createElement('div')
                 playlist.style.width = '85%'
@@ -179,7 +234,7 @@
                 let isDragging = false
 
                 popup.addEventListener("mousedown", function(event) {
-                    isDragging = true;
+                    isDragging = true
                     posX = event.clientX - popup.offsetLeft
                     posY = event.clientY - popup.offsetTop
                     posX_ = event.clientX - playlist.offsetLeft
