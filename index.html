@@ -216,13 +216,19 @@
                 }
                 
                 let popup = document.createElement('div')
+                popup.className = 'popup'
                 popup.style.position = 'fixed'
-                popup.style.top = '0'
-                popup.style.left = '0'
                 popup.style.width = '720px'
                 popup.style.height = '760px'
                 popup.style.left = last_popup==null ? '116px' : parseInt(last_popup.style.left.replace('px',''))+96+'px'
-                popup.style.top = last_popup==null ? '52px' : last_popup.style.top
+                popup.style.top = last_popup==null ? '96px' : last_popup.style.top
+                let maxZIndex = 0
+                let popups = document.querySelectorAll('.popup')
+                popups.forEach((popup) => {
+                    const zIndex = parseInt(window.getComputedStyle(popup).getPropertyValue('z-index'))
+                    if (zIndex > maxZIndex) maxZIndex = zIndex
+                })
+                popup.style.zIndex = maxZIndex + 1
 
                 popup.append(activitybar)
                 popup.appendChild(query_text)
@@ -239,6 +245,18 @@
                     posY = event.clientY - popup.offsetTop
                     posX_ = event.clientX - playlist.offsetLeft
                     posY_ = event.clientY - playlist.offsetTop
+
+                    let maxZIndex = 0
+                    let popups = document.querySelectorAll('.popup')
+                    popups.forEach((popup) => {
+                        const zIndex = parseInt(window.getComputedStyle(popup).getPropertyValue('z-index'))
+                        if (zIndex > maxZIndex) maxZIndex = zIndex
+                    })
+                    popup.style.zIndex = maxZIndex + 1
+                    for (let i = 0; i < popups.length; i++) {
+                        let otherPopup = popups[i]
+                        if (otherPopup !== popup) otherPopup.style.zIndex -=1
+                    }
                 })
                 popup.addEventListener("mousemove", function(event) {
                     if (isDragging) {
@@ -255,6 +273,9 @@
                 popup.addEventListener("mouseup", function() {
                     isDragging = false
                 })
+                // popup.addEventListener("click", function() {
+                    
+                // })
 
                 last_popup = popup
 
@@ -264,10 +285,18 @@
             
             //
 
+            // let playlists_overflow = document.createElement('div')
+            // document.body.appendChild(playlists_overflow)
+            // playlists_overflow.style.overflowX = 'auto'
+            // playlists_overflow.style.whiteSpace = 'nowrap'
+
             let playlists_overflow = document.createElement('div')
             document.body.appendChild(playlists_overflow)
-            playlists_overflow.style.overflowX = 'auto'
+            playlists_overflow.style.overflowY = 'auto'
             playlists_overflow.style.whiteSpace = 'nowrap'
+            playlists_overflow.style.display = 'flex'
+            playlists_overflow.style.flexWrap = 'wrap'
+            playlists_overflow.style.maxHeight = '160px'
 
             let button_spawn_playlist = document.createElement('button')
             playlists_overflow.appendChild(button_spawn_playlist)
