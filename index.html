@@ -76,12 +76,12 @@
 
                 let query_text = document.createElement('textarea')
                 query_text.type = 'text'
-                query_text.placeholder = playlist_title==null ? 'Paste YouTube URL or Text Query and Hit Enter \nor Drop an Audio File' : playlist_title
+                query_text.placeholder = playlist_title==null ? 'Paste YouTube URL or Type Text Query and Hit Enter \nor Drop an Audio File' : playlist_title
                 query_text.rows = 3//6
                 query_text.style.resize = 'none'
-                query_text.style.width = '84%'
-                query_text.style.height = '6%'
-                query_text.style.margin = '2% auto 0'
+                query_text.style.width = '610px'
+                query_text.style.height = '36px'
+                query_text.style.margin = '2px 4px'
                 query_text.style.textAlign = 'center'
                 query_text.style.paddingTop = '6px'
                 query_text.style.font = '8pt Quicksand'
@@ -187,8 +187,8 @@
                 })
 
                 let playlist = document.createElement('div')
-                playlist.style.width = '85%'
-                playlist.style.height = '72%'
+                playlist.style.width = '630px'
+                playlist.style.height = '620px'
                 playlist.style.backgroundColor = '#000000'
                 playlist.style.overflowY = 'scroll'
                 playlist.style.display = 'block'
@@ -217,9 +217,10 @@
                 
                 let popup = document.createElement('div')
                 popup.className = 'popup'
+                popup.style.backgroundColor = 'rgba(0, 0, 0, 0.8)'
                 popup.style.position = 'fixed'
-                popup.style.width = '720px'
-                popup.style.height = '760px'
+                popup.style.width = '630px'
+                popup.style.height = '720px'
                 popup.style.left = last_popup==null ? '116px' : parseInt(last_popup.style.left.replace('px',''))+96+'px'
                 popup.style.top = last_popup==null ? '96px' : last_popup.style.top
                 let maxZIndex = 0
