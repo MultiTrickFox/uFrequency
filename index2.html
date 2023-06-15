@@ -180,7 +180,7 @@
                     for (let entry of entries) {
                         if (entry.isDirectory)
                             await recursive_read_folder(entry.createReader())
-                        else
+                        else {
                             if (entry.name.endsWith('mp3') || entry.name.endsWith('wav')) {
                                 let completed_ = false
                                 entry.file(file => {
@@ -194,6 +194,7 @@
                                 })
                                 while (!completed_) await sleep(.1)
                             }
+                        }
                     }
                     completed = true
                 })
