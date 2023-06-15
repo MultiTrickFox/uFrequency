@@ -30,13 +30,13 @@
 
         // body
 
-        document.body.style.display = "flex"
-        document.body.style.alignItems = "center"
-        document.body.style.justifyContent = "center"
+        // document.body.style.display = "flex"
+        // document.body.style.alignItems = "center"
+        // document.body.style.justifyContent = "center"
 
-        document.body.style.textAlign = "center"
-        document.body.style.fontFamily = 'Quicksand'
-        document.body.innerHTML = '<br>uFrequency<br><br>AI Audio Playground' //'<br /><span style="font-size: 12pt;"><br>uFrequency</span><br /><br /><span style="font-size: 10pt;"><br><br>&nbsp;&nbsp;&nbsp;AI Audio Playground</span>'
+        // document.body.style.textAlign = "center"
+        // document.body.style.fontFamily = 'Quicksand'
+        // document.body.innerHTML = '<br>uFrequency<br><br>AI Audio Playground' //'<br /><span style="font-size: 12pt;"><br>uFrequency</span><br /><br /><span style="font-size: 10pt;"><br><br>&nbsp;&nbsp;&nbsp;AI Audio Playground</span>'
 
         // my_samples div
 
@@ -57,9 +57,10 @@
 
         div_my_samples.style.font = '10pt Quicksand'
         div_my_samples.style.display = 'flex'
+        div_my_samples.style.overflow = 'auto'
         div_my_samples.style.alignItems = 'center'
         div_my_samples.style.justifyContent = 'center'
-
+        
         div_my_samples.innerHTML = '::: my_samples :::<br><br>Drop an Audio'
             
         // search_my_samples div
@@ -68,9 +69,9 @@
         document.body.appendChild(div_search_my_samples)
 
         div_search_my_samples.style.position = 'absolute'
-        div_search_my_samples.style.top = (parseInt(div_my_samples.style.height.replace('px',''))+1).toString()+'px'
+        div_search_my_samples.style.top = '600px'
         div_search_my_samples.style.left = '0'
-        div_search_my_samples.style.width = (parseInt(div_my_samples.style.width.replace('px',''))-4).toString()+'px'
+        div_search_my_samples.style.width = '200px'
         div_search_my_samples.style.height = '86px'
         div_search_my_samples.style.resize = 'none'
 
@@ -144,13 +145,18 @@
 
         // my_samples div
 
-        (async () => {
+        async function populate_my_samples_div() {
             let result = await fetch_get_sample('')
-            console.log('get sample result:',result)
-            // for (let sample of ) {
-            //     let
-            // }
-        })()
+            if (result) {
+                div_my_samples.innerHTML = ''
+                div_my_samples.style.alignItems = 'flex-start'
+                for (let i = 0; i < 1; i++)
+                    for (let sample of result) {
+                        let sample = sample.replaceAll('<>','/')
+                        div_my_samples.innerHTML += +'\n'+sample
+                    }
+            }
+        }
         
         div_my_samples.addEventListener('dragover', function(event) {
             event.preventDefault()
@@ -180,7 +186,7 @@
                                 entry.file(file => {
                                     let reader = new FileReader()
                                     reader.onload = async (event) => {
-                                        await fetch_set_sample(new Uint8Array(event.target.result), entry.fullPath.replaceAll('/','<>'))
+                                        await fetch_set_sample(new Uint8Array(event.target.result), entry.fullPath.substring(1,entry.fullPath.length-1).replaceAll('/','<>'))
                                         completed_ = true
                                     }
                                     reader.readAsArrayBuffer(file)
@@ -566,6 +572,7 @@
     <script>
         //test()
         main()
+        populate_my_samples_div()
     </script>
 
 </body>
