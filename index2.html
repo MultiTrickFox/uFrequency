@@ -167,17 +167,18 @@
                         if (entry.isDirectory)
                             await recursive_read_folder(entry.createReader())
                         else {
-                            let completed_ = false
-                            entry.file(file => {
-                                let reader = new FileReader()
-                                reader.onload = async (event) => {
-                                    console.log(entry)
-                                    await fetch_set_sample(new Uint8Array(event.target.result), entry.fullPath.replaceAll('/','<>'))
-                                    completed_ = true
-                                }
-                                reader.readAsArrayBuffer(file)
-                            })
-                            while (!completed_) await sleep(.1)
+                            if (entry.name.endsWith('mp3') || entry.name.endsWith('wav')) {
+                                let completed_ = false
+                                entry.file(file => {
+                                    let reader = new FileReader()
+                                    reader.onload = async (event) => {
+                                        await fetch_set_sample(new Uint8Array(event.target.result), entry.fullPath.replaceAll('/','<>'))
+                                        completed_ = true
+                                    }
+                                    reader.readAsArrayBuffer(file)
+                                })
+                                while (!completed_) await sleep(.1)
+                            }
                         }
                     }
                     completed = true
@@ -204,15 +205,19 @@
 
                     console.log('file:',file.name)
                     
-                    let reader = new FileReader()
-                    let completed = false
-                    reader.onload = async (event) => {
-                        await fetch_set_sample(new Uint8Array(event.target.result), file.name)
-                        completed = true
-                    }
-                    reader.readAsArrayBuffer(file)
+                    if (entry.name.endsWith('mp3') || entry.name.endsWith('wav')) {
 
-                    while (!completed) await sleep(.1)
+                        let reader = new FileReader()
+                        let completed = false
+                        reader.onload = async (event) => {
+                            await fetch_set_sample(new Uint8Array(event.target.result), file.name)
+                            completed = true
+                        }
+                        reader.readAsArrayBuffer(file)
+
+                        while (!completed) await sleep(.1)
+
+                    }
 
                 }
 
