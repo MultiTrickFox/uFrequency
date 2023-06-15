@@ -199,7 +199,7 @@
 
                 } else {
                     
-                    if (entry.name.endsWith('mp3') || entry.name.endsWith('wav')) {
+                    if (file.name.endsWith('mp3') || file.name.endsWith('wav')) {
                         let reader = new FileReader()
                         let completed = false
                         reader.onload = async (event) => {
