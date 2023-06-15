@@ -170,10 +170,8 @@
                             let completed_ = false
                             entry.file(file => {
                                 let reader = new FileReader()
-                                reader.onload = (event) => {
-                                    console.log('entry:',entry)
-                                    console.log('Array Buffer readresult:', event.target.result)
-                                    //await fetch_set_sample(new Uint8Array(reader_result), )
+                                reader.onload = async (event) => {
+                                    await fetch_set_sample(new Uint8Array(event.target.result), entry.fullPath.replaceAll('/','<>'))
                                     completed_ = true
                                 }
                                 reader.readAsArrayBuffer(file)
@@ -194,20 +192,26 @@
                 i++
 
                 if (!file.type) {
+
                     console.log('folder:',file.name)
 
                     file = items[i].webkitGetAsEntry()
-                    console.log('folder_webkitentry:',file)
 
-                    let folder_reader = file.createReader()
-                    console.log('folder_reader:',folder_reader)
-
-                    await recursive_read_folder(folder_reader)
+                    await recursive_read_folder(file.createReader())
 
                 } else {
+                    
                     console.log('file:',file.name)
                     
-                    //Todo: read these files normally
+                    let reader = new FileReader()
+                    let completed = false
+                    reader.onload = async (event) => {
+                        await fetch_set_sample(new Uint8Array(event.target.result), file.name)
+                        completed = true
+                    }
+                    reader.readAsArrayBuffer(file)
+
+                    while (!completed) await sleep(.1)
 
                 }
 
