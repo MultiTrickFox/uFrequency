@@ -160,6 +160,21 @@
             request_processing = true
             document.body.style.cursor = 'wait'
 
+            let flat_files = []
+            function recursive_read_folder(folder_reader) {
+                folder_reader.readEntries((entries) => {
+                    for (let entry of entries) {
+                        if (entry.isDirectory) {
+                            folder_reader = entry.createReader()
+                            recursive_read_folder(folder_reader)
+                        } else {
+                            console.log('leaf file:',entry.name)
+                            flat_files.append(entry.name)
+                        }
+                    }
+                })
+            }
+                    
             let items = event.dataTransfer.items
             let files = event.dataTransfer.files
 
@@ -176,22 +191,15 @@
                     let folder_reader = file.createReader()
                     console.log('folder_reader:',folder_reader)
 
-                    folder_reader.readEntries(
-                        (result) => {
-                            console.log('result:',result)
-                        },
-                        (error) => {
-                            console.log('error:',error)
-                        }
-                    )
+                    recursive_read_folder(folder_reader)
 
                 } else {
                     console.log('file:',file.name)
                 }
 
-
-
             }
+
+            console.log('flat files final:',flat_files)
 
             request_processing = false
             document.body.style.cursor = 'auto'
@@ -200,27 +208,8 @@
 
 
 
-        // function readFolderContents(directoryReader) {
-        // directoryReader.readEntries(function(entries) {
-        //     console.log('***', entries);
-        //     if (entries.length > 0) {
-        //     // Process each entry
-        //     entries.forEach(function(entry) {
-        //         if (entry.isDirectory) {
-        //         // If entry is a directory, recursively call readFolderContents()
-        //         const subDirectoryReader = entry.createReader();
-        //         readFolderContents(subDirectoryReader);
-        //         } else {
-        //         // If entry is a file, log its name
-        //         console.log(entry.name);
-        //         }
-        //     });
 
-        //     // Continue reading entries if there are more
-        //     readFolderContents(directoryReader);
-        //     }
-        // });
-        // }
+        
 
 
 
