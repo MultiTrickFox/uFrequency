@@ -166,7 +166,7 @@
                     for (let entry of entries) {
                         if (entry.isDirectory)
                             await recursive_read_folder(entry.createReader())
-                        else {
+                        else
                             if (entry.name.endsWith('mp3') || entry.name.endsWith('wav')) {
                                 let completed_ = false
                                 entry.file(file => {
@@ -179,7 +179,6 @@
                                 })
                                 while (!completed_) await sleep(.1)
                             }
-                        }
                     }
                     completed = true
                 })
@@ -195,18 +194,12 @@
 
                 if (!file.type) {
 
-                    console.log('folder:',file.name)
-
                     file = items[i].webkitGetAsEntry()
-
                     await recursive_read_folder(file.createReader())
 
                 } else {
-
-                    console.log('file:',file.name)
                     
                     if (entry.name.endsWith('mp3') || entry.name.endsWith('wav')) {
-
                         let reader = new FileReader()
                         let completed = false
                         reader.onload = async (event) => {
@@ -214,9 +207,7 @@
                             completed = true
                         }
                         reader.readAsArrayBuffer(file)
-
                         while (!completed) await sleep(.1)
-
                     }
 
                 }
