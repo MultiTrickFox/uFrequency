@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>uFrequency</title>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.png">
+</head>
+<body style="
+    cursor: auto;
+    margin: 0;
+    overflow-y: scroll;
+    -webkit-user-select: none;
+    ">
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <script>
+
+        // global states here
+    
+        var username = 'Zer0'
+        var password = 'none'
+
+        var request_processing = false
+
+    </script>
+
+    <script>
+
+        // body
+
+        document.body.style.display = "flex"
+        document.body.style.alignItems = "center"
+        document.body.style.justifyContent = "center"
+
+        document.body.style.textAlign = "center"
+        document.body.style.fontFamily = 'Quicksand'
+        document.body.innerHTML = '<br>uFrequency<br><br>AI Audio Playground' //'<br /><span style="font-size: 12pt;"><br>uFrequency</span><br /><br /><span style="font-size: 10pt;"><br><br>&nbsp;&nbsp;&nbsp;AI Audio Playground</span>'
+
+        // my_samples div
+
+        const div_my_samples = document.createElement('div')
+        document.body.appendChild(div_my_samples)
+
+        div_my_samples.style.position = 'absolute'
+        div_my_samples.style.top = '0'
+        div_my_samples.style.left = '0'
+        div_my_samples.style.width = '200px'
+        div_my_samples.style.height = '600px'
+
+        div_my_samples.style.border = '1px solid black'
+        div_my_samples.style.borderWidth = '1px'
+        div_my_samples.style.borderColor = 'black'
+        div_my_samples.style.borderStyle = 'solid'
+        div_my_samples.style.borderRadius = '16px'
+
+        div_my_samples.style.font = '10pt Quicksand'
+        div_my_samples.style.display = 'flex'
+        div_my_samples.style.alignItems = 'center'
+        div_my_samples.style.justifyContent = 'center'
+
+        div_my_samples.innerHTML = '::: my_samples :::<br><br>Drop an Audio'
+            
+        // search_my_samples div
+
+        const div_search_my_samples = document.createElement('textarea')
+        document.body.appendChild(div_search_my_samples)
+
+        div_search_my_samples.style.position = 'absolute'
+        div_search_my_samples.style.top = (parseInt(div_my_samples.style.height.replace('px',''))+1).toString()+'px'
+        div_search_my_samples.style.left = '0'
+        div_search_my_samples.style.width = (parseInt(div_my_samples.style.width.replace('px',''))-4).toString()+'px'
+        div_search_my_samples.style.height = '86px'
+        div_search_my_samples.style.resize = 'none'
+
+        div_search_my_samples.style.border = '1px solid black'
+        div_search_my_samples.style.borderWidth = '1px'
+        div_search_my_samples.style.borderColor = 'black'
+        div_search_my_samples.style.borderStyle = 'solid' 
+        div_search_my_samples.style.borderRadius = '16px'
+
+        div_search_my_samples.style.font = '8pt Quicksand'
+        div_search_my_samples.style.display = 'flex'
+        div_search_my_samples.style.textAlign = 'center'
+        div_search_my_samples.style.alignItems = 'center'
+        div_search_my_samples.style.justifyContent = 'center'
+
+        div_search_my_samples.placeholder = '\n::: search_my_samples :::\n\nType and Hit Enter\nOr\nDrop an Audio'
+
+        // analyze_a_song div
+
+        const div_analyze_a_song = document.createElement('div')
+        document.body.appendChild(div_analyze_a_song)
+
+        div_analyze_a_song.style.position = 'absolute'
+        div_analyze_a_song.style.top = '0'
+        div_analyze_a_song.style.right = '0'
+        div_analyze_a_song.style.height = '200px'
+        div_analyze_a_song.style.width = '200px'
+
+        div_analyze_a_song.style.border = '1px solid black'        
+        div_analyze_a_song.style.borderWidth = '1px'
+        div_analyze_a_song.style.borderColor = 'black'
+        div_analyze_a_song.style.borderStyle = 'solid'
+        div_analyze_a_song.style.borderRadius = '16px'
+
+        div_analyze_a_song.style.font = '10pt Quicksand'
+        div_analyze_a_song.style.display = 'flex'
+        div_analyze_a_song.style.alignItems = 'center'
+        div_analyze_a_song.style.justifyContent = 'center'
+
+        div_analyze_a_song.innerHTML = '::: analyze_a_song :::<br><br>Drop an Audio'
+
+        // generate_a_sample div
+
+        const div_generate_a_sample = document.createElement('div')
+        document.body.appendChild(div_generate_a_sample)
+
+        div_generate_a_sample.style.position = 'absolute'
+        div_generate_a_sample.style.bottom = '0'
+        div_generate_a_sample.style.right = '0'
+        div_generate_a_sample.style.width = '200px'
+        div_generate_a_sample.style.height = '200px'
+
+        div_generate_a_sample.style.border = '1px solid black'
+        div_generate_a_sample.style.borderWidth = '1px'
+        div_generate_a_sample.style.borderColor = 'black'
+        div_generate_a_sample.style.borderStyle = 'solid'
+        div_generate_a_sample.style.borderRadius = '16px'
+
+        div_generate_a_sample.style.font = '10pt Quicksand'
+        div_generate_a_sample.style.display = 'flex'
+        div_generate_a_sample.style.alignItems = 'center'
+        div_generate_a_sample.style.justifyContent = 'center'
+
+        div_generate_a_sample.innerHTML = '::: generate_a_sample :::<br><br>Type and Hit Enter<br>Or<br>Drop an Audio<br>Or<br>Type and Drop an Audio'
+
+    </script>
+
+    <script>
+
+        // todo: define the functionality of divs here
+
+        // my_samples div
+
+        div_my_samples.addEventListener('dragover', function(event) {
+            event.preventDefault()
+            div_my_samples.style.background = 'lightgray'
+        })
+        div_my_samples.addEventListener('dragleave', function(event) {
+            event.preventDefault()
+            div_my_samples.style.background = 'white'
+        })
+        div_my_samples.addEventListener('drop', async function(event) {
+            event.preventDefault()
+            div_my_samples.style.background = 'white'
+
+            if (request_processing) return
+            request_processing = true
+            document.body.style.cursor = 'wait'
+
+            let items = event.dataTransfer.items
+            let files = event.dataTransfer.files
+
+            let i = -1
+            for (let file of files) {
+                i++
+
+                if (!file.type) {
+                    console.log('folder:',file.name)
+
+                    file = items[i].webkitGetAsEntry()
+                    console.log('folder_webkitentry:',file)
+
+                    let folder_reader = file.createReader()
+                    console.log('folder_reader:',folder_reader)
+
+                    folder_reader.readEntries(
+                        (result) => {
+                            console.log('result:',result)
+                        },
+                        (error) => {
+                            console.log('error:',error)
+                        }
+                    )
+
+                } else {
+                    console.log('file:',file.name)
+                }
+
+
+
+            }
+
+            request_processing = false
+            document.body.style.cursor = 'auto'
+
+        })
+
+
+
+        // function readFolderContents(directoryReader) {
+        // directoryReader.readEntries(function(entries) {
+        //     console.log('***', entries);
+        //     if (entries.length > 0) {
+        //     // Process each entry
+        //     entries.forEach(function(entry) {
+        //         if (entry.isDirectory) {
+        //         // If entry is a directory, recursively call readFolderContents()
+        //         const subDirectoryReader = entry.createReader();
+        //         readFolderContents(subDirectoryReader);
+        //         } else {
+        //         // If entry is a file, log its name
+        //         console.log(entry.name);
+        //         }
+        //     });
+
+        //     // Continue reading entries if there are more
+        //     readFolderContents(directoryReader);
+        //     }
+        // });
+        // }
+
+
+
+
+
+
+        // all these popups are resizable
+        // with overflow x-y
+        // the elements are stable width,height in px
+
+
+        async function popup_sample_analysis() {
+
+        }
+
+        async function popup_sample_search() {
+
+        }
+
+        async function popup_song_analysis() {
+
+        }
+
+        async function popup_song_generation() {
+
+        }
+
+    </script>
+
+    <script>
+
+        // even lower helpers...
+
+    </script>
+
+    <script>
+
+        // helper functions of UI elements
+
+
+
+
+
+    </script>
+
+    <script> // you will probably delete this part in the end (since every function call will be async by actions)
+
+        async function main() {
+
+
+
+        }
+
+        async function test() {
+
+            //
+
+            // let sample_data = await fetch('https://cdn.pixabay.com/download/audio/2023/04/03/audio_047543feac.mp3?filename=relaxing-145038.mp3&g-recaptcha-response=03AL8dmw-mjkFHuZC-rfah8MAqx2LmvbPSeJF4DMDllC7ms1LC3Hdj6pQf3zf_92ltenZRy59aagEABpFACNgkhJpy94NM2U5t46w0F73d4iaoQXImUIkAgYxTmFivuCqDf0tGwl-Rs4rLrN7QcAqLLvNK11f0I9MvgXvacr0qxydCbdsBAtH1f4JD1f9CppRv5Hw9UUvgmTbDrYo-x2sYpe9Mt5BWMfmOV3w6NyoNDUxmJJMfBLd8_UGDly_Y3iOaeMueCFTlrG0qkSTHn0eBgRVCZNnrwftWO3v-rat573cPUjSkq4cpKBGAI2on4tRKfXMHw2HUclnLUB7Tj7_-1KdzdoUy_Bbjsy9_lS9nc_8S2y-B6eaoC8w_syOLmXhWyQ8Xx0UB6MMjIwPyEBDpA5oJjsApJJir2y_pVWl4AWZGb07CoRwAFMPNSSiP2hTCBUboSf2_CmcHdhyNshILlQY69zlelJbSAIs3EkH2dhbODuV0VOKXfoKBRGpPRnsE2OLHWQv_FECdY1rZM-MikiAPxba-5kEcXA&remote_template=1')
+            // sample_data = await sample_data.arrayBuffer()
+            // let song_data = await fetch('https://cdn.pixabay.com/download/audio/2022/02/08/audio_b270bd6a3c.mp3?filename=yakaliyakali-18486.mp3')
+            // song_data = await song_data.arrayBuffer()
+
+            let sample_data = null
+
+            //
+
+            let dragdrop = document.createElement('div')
+            document.body.appendChild(dragdrop)
+            dragdrop.style.width = '300px'
+            dragdrop.style.height = '300px'
+            dragdrop.innerHTML = 'drag drop here'
+
+            dragdrop.addEventListener('dragover', function(event) {
+                event.preventDefault()
+                dragdrop.style.background = 'lightgray'
+            })
+            dragdrop.addEventListener('dragleave', function(event) {
+                event.preventDefault()
+                dragdrop.style.background = 'white'
+            })
+            dragdrop.addEventListener('drop', async function(event) {
+                event.preventDefault()
+                dragdrop.style.background = 'white'
+
+                let files = [event.dataTransfer.files[0]]
+
+                for (let file of files) {
+                    let filename = file.name
+
+                    let reader = new FileReader()
+                    let reader_result = null
+                    reader.onload = function(event) { reader_result = event.target.result }
+                    reader.readAsArrayBuffer(file)
+                    while (reader_result == null) await sleep(.1)
+
+                    sample_data = reader_result
+
+                }
+
+            })
+
+        
+
+
+
+
+
+
+
+
+
+            //
+
+            while (sample_data == null) await sleep(.1)
+
+            //
+
+
+            await fetch_set_sample(sample_data, 'deneme_sample.mp3')
+            let analysis_result1 = await fetch_get_sample('deneme_sample.mp3')
+
+            let tempo = analysis_result1.tempo
+            let pitch = analysis_result1.pitch
+
+            let pitch_meta = analysis_result1.pitch_meta
+
+            let CQT = analysis_result1.CQT_sync
+            let Chromagram = analysis_result1.C_sync
+            // Display the audio as waveform
+            // Display the CQT - same width different height
+            // Display the Chromagramm - same width different height
+            // Display the Mel - same width different height
+            // switch between theese
+
+
+
+            // const interpolators = [
+            //     d3.interpolateRdYlGn,
+            //     d3.interpolateYlGnBu,
+            //     d3.interpolateSpectral,
+            //     d3.interpolateRainbow,
+            //     d3.interpolateWarm,
+            //     d3.interpolateCool
+            // ];
+
+
+            for (data of [CQT, Chromagram]) {
+
+
+                //data = gaussianBlur(data, .9)
+
+
+                let heatmap = document.createElement('div')
+                document.body.appendChild(heatmap)
+                heatmap.id = 'heatmap'
+
+                let min = d3.min(data, d => d3.min(d))
+                let max = d3.max(data, d => d3.max(d))
+                //let absMax = Math.max(Math.abs(min), Math.abs(max))
+                //data = data.map(row => row.map(value => value / absMax))
+                //data = data.map(row => row.map(value => ((value-min)/(max-min))))
+
+                let margin = { top: 0, right: 0, bottom: 0, left: 0 }
+                let width = 300 - margin.left - margin.right
+                let height = 200 - margin.top - margin.bottom
+                let numCols = data[0].length
+                let numRows = data.length
+                let cellWidth = width / numCols
+                let cellHeight = height / numRows
+
+                let colorScale = d3.scaleSequential()
+                    .domain([min, max])
+                    .interpolator(d3.interpolateWarm)//d3.interpolate("#150157", "#ff8400"))
+
+                let svg = d3.select("#heatmap")
+                    .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", `translate(${margin.left}, ${margin.top})`)
+
+                let shapes = svg.selectAll("rect")
+                    .data(data.flat())
+                    .enter()
+                    .append("rect")
+                    .attr("x", (d, i) => (i % numCols) * cellWidth)
+                    .attr("y", (d, i) => Math.floor(i / numCols) * cellHeight)
+                    .attr("width", cellWidth)
+                    .attr("height", cellHeight)
+                    .style("fill", (d) => colorScale(d))
+                        
+                // const shapes = svg.selectAll("circle")
+                //     .data(data.flat())
+                //     .enter()
+                //     .append("circle")
+                //     .attr("cx", (d, i) => (i % numCols) * cellWidth + cellWidth / 2)
+                //     .attr("cy", (d, i) => Math.floor(i / numCols) * cellHeight + cellHeight / 2)
+                //     .attr("r", Math.min(cellWidth, cellHeight))
+                //     .attr("width", cellWidth)
+                //     .attr("height", cellHeight)
+                //     .style("fill", (d) => colorScale(d));
+
+                shapes.style("shape-rendering", "crispEdges")
+                shapes.style("image-rendering", "auto")
+
+            }
+
+
+            //
+
+            await fetch_recommend_sample_from_text('a random text', 2)
+            await fetch_recommend_sample_from_audio(song_data, 'deneme_audio.mp3', 2)
+
+            //
+
+            // let song_data2 = await fetch('https://cdn.pixabay.com/download/audio/2022/02/08/audio_b270bd6a3c.mp3?filename=yakaliyakali-18486.mp3')
+            // song_data2 = await song_data2.arrayBuffer()
+            // let analysis_result1 = await fetch_song_analysis(song_data2, "deneme_song.mp3")
+            // console.log('song_analysis result:\n',analysis_result1)
+
+        }
+
+    </script>
+
+    <script>
+
+        const sleep = sec => new Promise(r => setTimeout(r, sec*1_000))
+
+        //
+
+        async function fetch_set_sample(audio, audio_name) {
+            let xhr = new XMLHttpRequest()
+            let response
+            xhr.open("POST", "https://ufrequency.ai.ap.ngrok.io/producer", true)
+            xhr.setRequestHeader("username", username)
+            xhr.setRequestHeader("password", password)
+            xhr.setRequestHeader("cmd", "set_sample")
+            xhr.setRequestHeader("audio_name", audio_name)
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    console.log('set_sample response:',xhr.responseText)
+                    response = JSON.parse(xhr.responseText).answer
+                }
+            }
+            xhr.send(audio)
+            while (xhr.readyState != XMLHttpRequest.DONE) await sleep(.1)
+            response = response[0]
+            return response
+        }
+
+        async function fetch_get_sample(audio_name) {
+            let xhr = new XMLHttpRequest()
+            let response
+            xhr.open("POST", "https://ufrequency.ai.ap.ngrok.io/producer", true)
+            xhr.setRequestHeader("username", username)
+            xhr.setRequestHeader("password", password)
+            xhr.setRequestHeader("cmd", "get_sample")
+            xhr.setRequestHeader("audio_name", audio_name)
+            xhr.setRequestHeader("force_overwrite", true) // TODO: rm me later.
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    console.log('get_sample response:',xhr.responseText)
+                    response = JSON.parse(xhr.responseText).answer
+                }
+            }
+            xhr.send()
+            while (xhr.readyState != XMLHttpRequest.DONE) await sleep(.1)
+            response = response
+            return response
+        }
+
+        async function fetch_del_sample(audio_name) {
+            let xhr = new XMLHttpRequest()
+            let response
+            xhr.open("POST", "https://ufrequency.ai.ap.ngrok.io/producer", true)
+            xhr.setRequestHeader("username", username)
+            xhr.setRequestHeader("password", password)
+            xhr.setRequestHeader("cmd", "del_sample")
+            xhr.setRequestHeader("audio_name", audio_name)
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    console.log('del_sample response:',xhr.responseText)
+                    response = JSON.parse(xhr.responseText).answer
+                }
+            }
+            xhr.send()
+            while (xhr.readyState != XMLHttpRequest.DONE) await sleep(.1)
+            return response
+        }
+
+        //
+
+        async function fetch_recommend_sample_from_text(text, n) {
+            let xhr = new XMLHttpRequest()
+            let response
+            xhr.open("POST", "https://ufrequency.ai.ap.ngrok.io/producer", true)
+            xhr.setRequestHeader("username", username)
+            xhr.setRequestHeader("password", password)
+            xhr.setRequestHeader("cmd", "recommend_sample")
+            xhr.setRequestHeader("query", text)
+            xhr.setRequestHeader("n", n)
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    console.log('recommend_sample_from_text response:',xhr.responseText)
+                    response = JSON.parse(xhr.responseText).answer
+                }
+            }
+            xhr.send()
+            while (xhr.readyState != XMLHttpRequest.DONE) await sleep(.1)
+            return response
+        }
+
+        async function fetch_recommend_sample_from_audio(audio, audio_name, n) {
+            let xhr = new XMLHttpRequest()
+            let response
+            xhr.open("POST", "https://ufrequency.ai.ap.ngrok.io/producer", true)
+            xhr.setRequestHeader("username", username)
+            xhr.setRequestHeader("password", password)
+            xhr.setRequestHeader("cmd", "recommend_sample")
+            xhr.setRequestHeader("audio_name", audio_name)
+            xhr.setRequestHeader("n", n)
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    console.log('recommend_sample_from_audio response:',xhr.responseText)
+                    response = JSON.parse(xhr.responseText).answer
+                }
+            }
+            xhr.send(audio)
+            while (xhr.readyState != XMLHttpRequest.DONE) await sleep(.1)
+            return response
+        }
+
+    </script>
+
+    <script>
+        //test()
+        main()
+    </script>
+
+</body>
+</html>
