@@ -168,8 +168,8 @@
                             folder_reader = entry.createReader()
                             recursive_read_folder(folder_reader)
                         } else {
-                            console.log('leaf file:',entry.name)
-                            flat_files.append(entry.name)
+                            console.log('leaf file:',entry)
+                            flat_files.push(entry)
                         }
                     }
                 })
