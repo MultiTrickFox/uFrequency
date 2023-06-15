@@ -57,7 +57,7 @@
 
         div_my_samples.style.font = '10pt Quicksand'
         div_my_samples.style.display = 'flex'
-        div_my_samples.style.overflow = 'auto'
+        div_my_samples.style.overflow = 'scroll'
         div_my_samples.style.alignItems = 'center'
         div_my_samples.style.justifyContent = 'center'
         
@@ -146,14 +146,15 @@
         // my_samples div
 
         async function populate_my_samples_div() {
-            let result = await fetch_get_sample('')
-            if (result.length) {
+            let my_samples = await fetch_get_sample('')
+            if (my_samples.length) {
                 div_my_samples.innerHTML = ''
                 div_my_samples.style.alignItems = 'flex-start'
                 for (let i = 0; i < 1; i++)
-                    for (let sample of result) {
-                        sample = sample.replaceAll('<>','/')
-                        div_my_samples.innerHTML += +'\n'+sample
+                    for (let my_sample of my_samples) {
+                        let div_my_sample = document.createElement('button')
+                        div_my_samples.appendChild(div_my_sample)
+                        div_my_sample.innerHTML += +'\n'+my_sample.replaceAll('<>','/')
                     }
             }
         }
@@ -202,6 +203,9 @@
                
             let items = event.dataTransfer.items
             let files = event.dataTransfer.files
+
+            console.log('files',files)
+            console.log('items',items)
 
             let i = -1
             for (let file of files) {
