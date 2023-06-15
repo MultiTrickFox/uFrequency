@@ -161,20 +161,28 @@
             document.body.style.cursor = 'wait'
 
             let flat_files = []
-            function recursive_read_folder(folder_reader) {
-                folder_reader.readEntries((entries) => {
+
+            async function recursive_read_folder(folder_reader) {
+                let completed = false
+                folder_reader.readEntries(async (entries) => {
                     for (let entry of entries) {
-                        if (entry.isDirectory) {
-                            folder_reader = entry.createReader()
-                            recursive_read_folder(folder_reader)
-                        } else {
-                            console.log('leaf file:',entry)
+                        if (entry.isDirectory)
+                            await recursive_read_folder(entry.createReader())
+                        else {
                             flat_files.push(entry)
+                            // fileEntry.file(file => {
+                            //     let reader = new FileReader()
+                            //     reader.onload = () => resolve(reader.result)
+                            //     reader.onerror = reject;
+                            //     reader.readAsArrayBuffer(file)
+                            // })
                         }
                     }
+                    completed = true
                 })
+                while (!completed) await sleep(.1)
             }
-                    
+               
             let items = event.dataTransfer.items
             let files = event.dataTransfer.files
 
@@ -191,10 +199,15 @@
                     let folder_reader = file.createReader()
                     console.log('folder_reader:',folder_reader)
 
-                    recursive_read_folder(folder_reader)
+                    await recursive_read_folder(folder_reader)
 
                 } else {
                     console.log('file:',file.name)
+                    
+                    flat_files.append(items[i].webkitGetAsEntry())
+
+                    //Todo: read these files normally
+
                 }
 
             }
