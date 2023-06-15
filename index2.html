@@ -171,6 +171,7 @@
                             entry.file(file => {
                                 let reader = new FileReader()
                                 reader.onload = async (event) => {
+                                    console.log(entry)
                                     await fetch_set_sample(new Uint8Array(event.target.result), entry.fullPath.replaceAll('/','<>'))
                                     completed_ = true
                                 }
@@ -200,7 +201,7 @@
                     await recursive_read_folder(file.createReader())
 
                 } else {
-                    
+
                     console.log('file:',file.name)
                     
                     let reader = new FileReader()
