@@ -160,8 +160,6 @@
             request_processing = true
             document.body.style.cursor = 'wait'
 
-            let flat_files = []
-
             async function recursive_read_folder(folder_reader) {
                 let completed = false
                 folder_reader.readEntries(async (entries) => {
@@ -169,13 +167,16 @@
                         if (entry.isDirectory)
                             await recursive_read_folder(entry.createReader())
                         else {
-                            flat_files.push(entry)
-                            // fileEntry.file(file => {
-                            //     let reader = new FileReader()
-                            //     reader.onload = () => resolve(reader.result)
-                            //     reader.onerror = reject;
-                            //     reader.readAsArrayBuffer(file)
-                            // })
+                            let completed_ = false
+                            fileEntry.file(file => {
+                                let reader = new FileReader()
+                                reader.onload = function(event) {
+                                    console.log('Array Buffer readresult:',event.target.result)
+                                    completed_ = true
+                                }
+                                reader.readAsArrayBuffer(file)
+                            })
+                            while (!completed_) await sleep(.1)
                         }
                     }
                     completed = true
