@@ -152,7 +152,7 @@
                 div_my_samples.style.alignItems = 'flex-start'
                 for (let i = 0; i < 1; i++)
                     for (let sample of result) {
-                        let sample = sample.replaceAll('<>','/')
+                        sample = sample.replaceAll('<>','/')
                         div_my_samples.innerHTML += +'\n'+sample
                     }
             }
