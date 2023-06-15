@@ -168,7 +168,7 @@
                             await recursive_read_folder(entry.createReader())
                         else {
                             let completed_ = false
-                            fileEntry.file(file => {
+                            entry.file(file => {
                                 let reader = new FileReader()
                                 reader.onload = function(event) {
                                     console.log('Array Buffer readresult:',event.target.result)
