@@ -147,7 +147,7 @@
 
         async function populate_my_samples_div() {
             let result = await fetch_get_sample('')
-            if (result) {
+            if (result.length) {
                 div_my_samples.innerHTML = ''
                 div_my_samples.style.alignItems = 'flex-start'
                 for (let i = 0; i < 1; i++)
@@ -184,6 +184,7 @@
                             if (entry.name.endsWith('mp3') || entry.name.endsWith('wav')) {
                                 let completed_ = false
                                 entry.file(file => {
+                                    console.log('filename:',entry.fullPath) // todo: rm me
                                     let reader = new FileReader()
                                     reader.onload = async (event) => {
                                         await fetch_set_sample(new Uint8Array(event.target.result), entry.fullPath.substring(1,entry.fullPath.length-1).replaceAll('/','<>'))
@@ -212,6 +213,7 @@
                 }
                 else {
                     if (file.name.endsWith('mp3') || file.name.endsWith('wav')) {
+                        console.log('filename:',file.name) // todo: rm me
                         let reader = new FileReader()
                         let completed = false
                         reader.onload = async (event) => {
