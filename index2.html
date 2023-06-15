@@ -170,8 +170,10 @@
                             let completed_ = false
                             entry.file(file => {
                                 let reader = new FileReader()
-                                reader.onload = function(event) {
-                                    console.log('Array Buffer readresult:',event.target.result)
+                                reader.onload = (event) => {
+                                    console.log('entry:',entry)
+                                    console.log('Array Buffer readresult:', event.target.result)
+                                    //await fetch_set_sample(new Uint8Array(reader_result), )
                                     completed_ = true
                                 }
                                 reader.readAsArrayBuffer(file)
@@ -210,8 +212,6 @@
                 }
 
             }
-
-            console.log('flat files final:',flat_files)
 
             request_processing = false
             document.body.style.cursor = 'auto'
