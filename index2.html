@@ -144,6 +144,14 @@
 
         // my_samples div
 
+        (async () => {
+            let result = await fetch_get_sample('')
+            console.log('get sample result:',result)
+            // for (let sample of ) {
+            //     let
+            // }
+        })()
+        
         div_my_samples.addEventListener('dragover', function(event) {
             event.preventDefault()
             div_my_samples.style.background = 'lightgray'
@@ -193,12 +201,10 @@
                 i++
 
                 if (!file.type) {
-
                     file = items[i].webkitGetAsEntry()
                     await recursive_read_folder(file.createReader())
-
-                } else {
-                    
+                }
+                else {
                     if (file.name.endsWith('mp3') || file.name.endsWith('wav')) {
                         let reader = new FileReader()
                         let completed = false
@@ -209,7 +215,6 @@
                         reader.readAsArrayBuffer(file)
                         while (!completed) await sleep(.1)
                     }
-
                 }
 
             }
@@ -461,6 +466,8 @@
             xhr.setRequestHeader("password", password)
             xhr.setRequestHeader("cmd", "set_sample")
             xhr.setRequestHeader("audio_name", audio_name)
+            xhr.setRequestHeader("force_overwrite", true) // todo: rm me later
+            xhr.setRequestHeader("keep_audio", false) // todo: rm me later
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == XMLHttpRequest.DONE) {
                     console.log('set_sample response:',xhr.responseText)
@@ -481,7 +488,6 @@
             xhr.setRequestHeader("password", password)
             xhr.setRequestHeader("cmd", "get_sample")
             xhr.setRequestHeader("audio_name", audio_name)
-            xhr.setRequestHeader("force_overwrite", true) // TODO: rm me later.
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == XMLHttpRequest.DONE) {
                     console.log('get_sample response:',xhr.responseText)
